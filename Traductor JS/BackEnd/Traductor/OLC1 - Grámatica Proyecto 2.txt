@@ -1,0 +1,226 @@
+/* incio de gramtica */
+<INICIO> = <CLASE>
+				| <INTERFACE>
+  			| e
+ 
+ 
+//************************************************************************************  
+//estructura de una variables
+<VARIABLES> = <VARIABLES> <VARIABLE>
+							| <VARIABLES> <VARIABLESMULTI>
+              
+           
+              
+//formato de una variable
+<VARIABLE> = <TIPO> <VAR> = <ASIGNACION> ;
+						| <TIPO> <VAR> ;
+
+<VARIABLESMULTI> =  <TIPO> <VAR> <VARIABLEMULTISIMPLI> ;
+                  
+<VARIABLEMULTISIMPLI> =  '=' <ASIGNACION> <VARIABLESMULTI2> ;
+													| <VARIABLESMULTI2> ;
+                  
+
+<VARIABLESMULTI2> = <VARIABLESMULTI2> , <VARIABLEMULTI2SIMPLI>
+                  
+<VARIABLEMULTI2SIMPLI> = <VAR> = <ASIGNACION>
+												| <VAR>
+
+
+//******************************************************************************************
+/* gramatica para clases en java */ 
+<CLASE> = <CLASE> public class <IDENTIFICADOR> { <TODOCLASE> }
+
+
+//******************************************************************************************
+// inerface en java
+<INTERFACE> = <INTERFACE> public interface <IDENTIFICADOR> { <TODOINTERFACE> }
+
+
+//******************************************************************************************
+// todo lo interno que puede traer una clase
+<TODOCLASE> = <TODOCLASE> <METODOS>
+							| <TODOCLASE> <FUNCIONES>
+              | <TODOCLASE> <VARIABLES>
+              | <METODOS>
+              | <FUNCIONES>
+              | <VARIABLES>
+              | <MAIN>
+              
+<MAIN> = public static void main ( String [] args){ <INSTRUCCIONES> }
+              
+
+ 
+//******************************************************************************************
+//estructura de una funcion en java
+<FUNCIONES> = public <TIPORETORNO> <IDENTIFICADOR> ( <PARAMETROS> ) { <INSTRUCCIONES> }
+
+
+//******************************************************************************************
+//estructura de un metodo en java
+<METODOS> = public <TIPORETORNO> <IDENTIFICADOR> ( <PARAMETROS> ) ;
+
+
+
+//******************************************************************************************
+<TIPORETORNO> = <TIPO>
+							| void
+ 
+// tipo aceptados y declarados en java 
+<TIPO> = int
+	| boolean
+	| double
+	| String
+  | char  
+
+
+//******************************************************************************************
+// tipo de parametro o parametros aceptado en una funcion o metodo en java
+<PARAMETROS> = <TIPO> <VARIABLE>
+							| <TIPO> <VARIABLE> <PARAMETROS2>
+              | e
+   
+   
+<PARAMETROS2> = <PARAMETROS2> , <TIPO> <VARIABLE>
+
+
+
+//******************************************************************************************
+/*
+*
+*
+* FOR
+*
+*
+*/
+
+<FOR> = for ( <DEC> ; <CONDICIONAL> ; <INCREMENT/DECREMENT> ) { <INSTRUCCIONES> }
+
+<WHILE> = while ( <CONDICIONAL-WHILE> ) { <INSTRUCCIONES> }
+
+
+<DO-WHILE> = { <INSTRUCCIONES> } while ( <CONDICIONAL-WHILE> ) ;
+
+
+<CONDICIONAL-WHILE> =  <CONDICIONAL>
+										| <VAR>
+                    | true
+                    | false
+                    
+// idea 1
+<IF> = if ( <CONDICIONAL-IF> ) { <INSTRUCCIONES> } <ELIF> <ELSE>
+
+<ELIF> = <ELIF> else if ( <CONDICIONAL-IF> ) { <INSTRUCCIONES> }
+				| else if ( <CONDICIONAL-IF> ) { <INSTRUCCIONES> }
+				| e
+
+<ELSE> = else { <INSTRUCCIONES> }
+				| e
+
+// idea 2
+<IF> = if ( <CONDICIONAL-IF> ) { <INSTRUCCIONES> } <ELIF-ELSE>
+
+<ELIF-ELSE> = else { <INSTRUCCIONES> } 
+						| else if ( <CONDICIONAL-IF> ) { <INSTRUCCIONES> }
+            | <ELIF-ELSE> else if ( <CONDICIONAL-IF> ) { <INSTRUCCIONES> }
+            | e
+
+
+
+<CONDICIONAL-IF> =  <EXP>
+									| <EXP> <EXPRESIONES_LOGICAS> <EXP>                  
+                  | <EXP> <EXPRECIONES_RELACIONALES> <EXP>
+                  | true
+                  | false
+                  | <CONDICIONAL-IF> <EXP> <EXPRECIONES_RELACIONALES> <EXP>
+                  | <CONDICIONAL-IF> <EXP> <EXPRESIONES_LOGICAS> <EXP> 
+                  | <CONDICIONAL-IF> true
+                  | <CONDICIONAL-IF> false
+
+
+<DEC> = <TIPO> <NOMBREVAR> = ASIGNACION
+				| <NOMBREVAR>
+    
+    
+
+<CONDICIONAL> = <NOMBREVAR> <EXPRECIONES_RELACIONALES> <EXP>
+
+
+
+
+
+<INCREMENT/DECREMENT> = EXP ++
+											| EXP --
+
+
+
+
+
+<EXPRESIONES_LOGICAS> = &&
+							| '||'
+							| !
+              | ^
+
+<EXPRECIONES_RELACIONALES> = >
+														| <
+                            | >=
+                            | <=
+                            | ==
+														| !=
+
+<EXPRECIONES_ARITMETICAS> = <EXP> + <EXP>
+													| <EXP> - <EXP>
+                          | <EXP> * <EXP>
+                          | <EXP> / <EXP>
+                          | <EXP> ++ 
+                          | <EXP> --
+													| - <EXP>
+                          | ( <EXPRECIONES_ARITMETICAS> )
+													| <EXP>
+                          
+
+<EXP> = <VAR>
+				| <NUMERO>
+				| <DECIMAL>
+        
+
+
+
+//****************************************************************************************************************
+<INSTRUCCIONES> = <INSTRUCCIONES> <CUERPO>
+								| <CUERPO>
+                
+<CUERPO> = <VARIABLES>
+					| <FOR>
+					| <WHILE>
+          | <DO-WHILE>
+          | <IF>
+          | System.out.print( <EXP> )
+          | System.out.println( <EXP> ) 
+
+<SENTENCIAS> = break;
+							| continue;
+              | return;
+              | return <ALGO> ;
+              
+              
+<ALGO> = <VAR>
+				| <EXPRECIONES_ARITMETICAS>
+        | <STRING>
+        | <CHAR>
+        | true
+        | false
+
+
+
+/*************************************************************************************************************
+
+
+public String metodo1 (int var1, String var2){}
+
+// ¿Viene public static void main?
+// <VAR> ExpresionRegular Nombre Variable
+// <IDENTIFICADOR> ExpresionRegular nombre metodos funciones clases
+// <STRING> ExpresionRegular Cadenas
+// <NUMERO> ExpresionRegular Numero
+// <DECIMAL> ExpresionRegular Decimal
