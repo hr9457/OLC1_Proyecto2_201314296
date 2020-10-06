@@ -1,0 +1,25 @@
+public class suma {
+
+    public static void main (String [] hola){
+        int x;
+        String var1="hola";
+        public void suma();
+        }
+        
+    public void suma();
+        
+    public int resta();
+        
+    public String nombre();
+    
+    public void nombreFuncion(int var,String nombre,double bandera){}
+    
+    public void setP(int x,String nombre, double estado);
+    
+    }
+    
+    
+    public interface Modificacion {
+    public void incremento();
+    public String texto(String hola,String nombre,int sueldo,boolean estado);
+    }
