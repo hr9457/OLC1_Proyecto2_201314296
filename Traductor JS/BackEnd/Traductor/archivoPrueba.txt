@@ -1,9 +1,8 @@
 public class suma {
-
+    
     public static void main (String [] hola){
         int x;
         String var1="hola";
-        public void suma();
         }
         
     public void suma();
@@ -23,3 +22,26 @@ public class suma {
     public void incremento();
     public String texto(String hola,String nombre,int sueldo,boolean estado);
     }
+
+
+public class clase{
+    // Un comentario para probar xD
+        
+    public static void main(String[] args) {		
+        int a, b;
+        a = 10;
+        b = 10;
+        
+        System.out.println("Hola mundo!");
+    }
+    
+    /*
+    *
+    *
+    * Función que suma dos números y devuelve el resultado
+    *
+    */
+    public int suma(int a, int b){
+        return resultado;
+    }
+}

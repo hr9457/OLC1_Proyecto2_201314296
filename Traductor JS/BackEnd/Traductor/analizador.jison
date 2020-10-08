@@ -29,10 +29,10 @@
 
 
 // aceptacion de numeros decimales
-[0-9]+.[0-9]+    {return 'Tk_decimal';}
+[0-9]+.[0-9]+\b    {return 'Tk_decimal';}
 
 // aceptacion de digitos de 0 a 9
-[0-9]+ {return 'Tk_digito';}
+[0-9]+\b {return 'Tk_digito';}
 
 
 // aceptacion de string
@@ -108,8 +108,12 @@
 
 
 
+
 // captura para erroles lexico , cualquier caracter, excepto los que ya definimos
-.   {return 'ERROR LEXICO:  '+yytext; listaErroresLexicos.push(yytext);}
+.   {console.log('ERROR LEXICO:  '+yytext);
+listaErroresLexicos.push(["Tipo: "+yytext,"Fila: "+yylloc.first_line,
+"Columna: "+yylloc.first_column,"Descripcion: El caracter "+yytext+" no pertenece al lenguaje"]);
+}
 
 
 
@@ -157,6 +161,7 @@ CLASE {}
 |INTERFACE {}
 |JAVA CLASE  {}
 |JAVA INTERFACE {}
+|ERROR 
 ;
 
 
@@ -175,15 +180,15 @@ ESTRUCTURA-INTERFACE {}
 
 // ESTRUCTURAS PERMITIAS DENTRO DE UNA CLASE DE JAVA
 ESTRUCTURA-CLASE:
-'Tk_public' 'TK_class' 'Tk_identificador' '{'  INSTRUCCIONES-CLASE  '}' {}
-|'Tk_public' 'TK_class' 'Tk_identificador' '{' '}' {}
+'Tk_public' 'TK_class' 'Tk_identificador' '{' '}' {}
+|'Tk_public' 'TK_class' 'Tk_identificador' '{'  INSTRUCCIONES-CLASE  '}' { console.log($1+" "+$2+" "+$3+" "+$4+" "+$6);}
 ;
 
 
 // ESTRUCTURA PERMITIDA DENTRO DE UNA INTERFACE DE JAVA
 ESTRUCTURA-INTERFACE:
 'Tk_public' 'Tk_interface' 'Tk_identificador' '{' '}'
-|'Tk_public' 'Tk_interface' 'Tk_identificador' '{' INSTRUCCIONES-INTERFACE '}'
+|'Tk_public' 'Tk_interface' 'Tk_identificador' '{' INSTRUCCIONES-INTERFACE '}' 
 ;
 
 
@@ -252,6 +257,7 @@ VARIABLE {}
 |FUNCION-DOWHILE {}
 |IMPRESION {}
 |IMPRESION-SALTO {}
+|RETORNO {}
 |INSTRUCCIONES-MAIN VARIABLE {}
 |INSTRUCCIONES-MAIN ASIGNACION-A {}
 |INSTRUCCIONES-MAIN LLAMADA-METODO {}
@@ -261,14 +267,19 @@ VARIABLE {}
 |INSTRUCCIONES-MAIN FUNCION-DOWHILE {}
 |INSTRUCCIONES-MAIN IMPRESION  {}
 |INSTRUCCIONES-MAIN IMPRESION-SALTO {}
+|INSTRUCCIONES-MAIN RETORNO {}
 ;
 
 
 // INSTRUCCIONES QUE PUEDE RECIBIR UNA INTERFACE EN JAVA
 INSTRUCCIONES-INTERFACE:
-FUNCION {}
-|INSTRUCCIONES-INTERFACE FUNCION {}
+'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';' {}
+|'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';' {}
+|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';' {}
+|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';' {}
+| ERROR ';'
 ;
+
 
 // todas las instrucciones aceptadas dentro de los metodos
 INSTRUCCIONES-METODO:
@@ -281,6 +292,7 @@ VARIABLE {}
 |LLAMADA-METODO {}
 |IMPRESION {}
 |IMPRESION-SALTO {}
+|RETORNO {}
 |INSTRUCCIONES-METODO VARIABLE {}
 |INSTRUCCIONES-METODO ASIGNACION-A {}
 |INSTRUCCIONES-METODO FUNCION-IF {}
@@ -290,6 +302,7 @@ VARIABLE {}
 |INSTRUCCIONES-METODO LLAMADA-METODO {}
 |INSTRUCCIONES-METODO IMPRESION  {}
 |INSTRUCCIONES-METODO IMPRESION-SALTO {}
+|INSTRUCCIONES-METODO RETORNO {}
 ;
 
 
@@ -302,17 +315,17 @@ Tk_identificador '=' EXPRESION ';' {}
 
 // ESTRUCTURA DE UNA VARIABLE
 VARIABLE:
-TIPO-VARIABLE DECLARACION ';' {console.log($3);}
-|error    {console.log("error variable");}
+TIPO-VARIABLE DECLARACION ';' {console.log($1+" "+$2+" "+$3);}
+| ERROR ';'
 ;
 
 
 // TIPO DE VARIABLES ACEPTADAS EN JAVA
 TIPO-VARIABLE:
-Tk_int      {}
+Tk_int      {$$="var"}
 |Tk_boolean {}
 |Tk_double  {}
-|Tk_String  {console.log($1);}
+|Tk_String  {}
 |Tk_char    {}
 ;
 
@@ -320,14 +333,14 @@ Tk_int      {}
 // DECLARACION DE UNA O VARIAS VARIABLES
 DECLARACION:
 ASIGNACION  {}
-| DECLARACION ',' ASIGNACION {console.log($2)}
+| DECLARACION ',' ASIGNACION {}
 ;
 
 
 // TIPOS DE ASIGNACION QUE SE LE PUEDE HACER A UNA VARIABLE
 ASIGNACION:
-Tk_identificador '=' EXPRESION  {console.log($1+" "+$2)}
-|Tk_identificador           {console.log($1);}
+Tk_identificador '=' EXPRESION  {}
+|Tk_identificador           {}
 ;
 
 
@@ -356,12 +369,12 @@ EXPRESION '&' '&' EXPRESION
 
 // VALOR QUE SE LE PUEDE ASIGNAR DENTRO DE JAVA
 VALOR:
-Tk_digito       {console.log($1);}
-|Tk_decimal     {console.log($1);}
-|Tk_cadena      {console.log($1);}
-|Tk_cadenaChar  {console.log($1);}
-|Tk_true        {console.log($1);}
-|Tk_false       {console.log($1);}
+Tk_digito       {}
+|Tk_decimal     {}
+|Tk_cadena      {}
+|Tk_cadenaChar  {}
+|Tk_true        {}
+|Tk_false       {}
 ;
 
 
@@ -429,6 +442,7 @@ FUNCION-IF
 |LLAMADA-METODO
 |IMPRESION
 |IMPRESION-SALTO
+|RETORNO 
 |INSTRUCCIONES-CICLOS FUNCION-IF
 |INSTRUCCIONES-CICLOS FUNCION-FOR
 |INSTRUCCIONES-CICLOS FUNCION-WHILE
@@ -436,6 +450,7 @@ FUNCION-IF
 |INSTRUCCIONES-CICLOS LLAMADA-METODO
 |INSTRUCCIONES-CICLOS IMPRESION
 |INSTRUCCIONES-CICLOS IMPRESION-SALTO
+|INSTRUCCIONES-CICLOS RETORNO 
 ;
 
 
@@ -444,6 +459,32 @@ FUNCION-IF
 // estructura de una llamda a metodo
 LLAMADA-METODO:
 Tk_identificador '(' ')' ';' {}
+|Tk_identificador '('  PARAMETROSEN-LLAMADA ')' ';' {}
+;
+
+
+// --parametros para llamadas a metodos--
+PARAMETROSEN-LLAMADA:
+VARIABLE-DEFINIDA
+|VALORDE-ENVIO
+|PARAMETROSEN-LLAMADA VARIABLE-DEFINIDA
+|PARAMETROSEN-LLAMADA VALORDE-ENVIO
+;
+
+
+// --variables definidas para recibir como parametros dentro de llamdas a Metodos--
+VARIABLE-DEFINIDA:
+Tk_identificador
+;
+
+// valores de envio hacia una llamada a metodo---
+VALORDE-ENVIO:
+Tk_digito       
+|Tk_decimal     
+|Tk_cadena      
+|Tk_cadenaChar  
+|Tk_true        
+|Tk_false       
 ;
 
 
@@ -458,10 +499,17 @@ Tk_break ';'
 
 // impresiones que se pueden realizar dentro java
 IMPRESION:
-Tk_System '.' Tk_out '.' 'Tk_print' '('  EXPRESION  ')'  ';' {}
+Tk_System '.' Tk_out '.' 'Tk_print' '('   ')'  ';' {}
+|Tk_System '.' Tk_out '.' 'Tk_print' '('  EXPRESION  ')'  ';' {}
 ;
 
 
 IMPRESION-SALTO:
-Tk_System '.' Tk_out '.' 'Tk_println' '('  EXPRESION  ')'  ';' {}
+Tk_System '.' Tk_out '.' 'Tk_println' '('  ')'  ';' {}
+|Tk_System '.' Tk_out '.' 'Tk_println' '('  EXPRESION  ')'  ';' {}
+;
+
+
+ERROR:
+error {console.log('error:  '+yytext+'  fila: '+ this._$.first_line );}
 ;
