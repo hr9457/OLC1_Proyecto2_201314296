@@ -6,6 +6,16 @@
     var listaErroresLexicos = []
     var listaErroresSintacticos = []
     var listaTraducccion = []
+    var json;
+    /* metodo para agregar y hacer el reporte de tokens reconocidos */
+    function addListaToken(fila,columna,tipo,token){
+        listaReporteToken.push({Fila:fila,Columna:columna,Tipo:tipo,Token:token});
+    }
+    /* metodo para guardar todos los errores lexico */
+    function addErrorLexico(tipo,fila,columna,descripcion){
+        listaErroresLexicos.push({Tipo:tipo,Fila:fila,Columna:columna,Descripcion:descripcion});
+    }
+
 %}
 
 //------------------------------------------------------------------------------------------------
@@ -28,94 +38,91 @@
 \s+  {}
 
 
-// aceptacion de numeros decimales
-[0-9]+(.[0-9])+\b     {return 'Tk_decimal';}
+//------------------------------------------- aceptacion de numeros decimales
+[0-9]+(.[0-9])+\b     {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"DECIMAL",""+yytext);return 'Tk_decimal';}
 
-// aceptacion de digitos de 0 a 9
-[0-9]+\b            {return 'Tk_digito';}
+//------------------------------------------- aceptacion de digitos de 0 a 9
+[0-9]+\b              {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"DIGITO",""+yytext);return 'Tk_digito';}
 
 
-// aceptacion de string
-\".*\"    {return 'Tk_cadena';}
+//-------------------------------------------- aceptacion de string
+\".*\"                {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"STRING",""+yytext);return 'Tk_cadena';}
 
-// acpetacion de char
-\'.*\'    {return 'Tk_cadenaChar';}
+//------------------------------------------- acpetacion de char
+\'.*\'                {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"CARACTER",""+yytext);return 'Tk_cadenaChar';}
 
-//  comentario unilinea
+//--------------------------------------------  comentario unilinea
 \/\/.*     {}
 
 
-// comentario multilinea
+//---------------------------------------------- comentario multilinea
 \/\*(\*(?!\/)|[^*])*\*\/    {}
 
 
 
 //*********************************************
 // PALABRAS RESEREVADAS POR EL LENGUAJE JAVA 25
-"public"    {return 'Tk_public';}
-"class"     {return 'TK_class';}
-"main"      {return 'Tk_main'}
-"interface" {return 'Tk_interface';}
-"void"      {return 'Tk_void';}
-"static"    {return 'Tk_static';}
-"int"       {return 'Tk_int';}
-"double"    {return 'Tk_double';}
-"char"      {return 'Tk_char';}
-"boolean"   {return 'Tk_boolean';}
-"true"      {return 'Tk_true';}
-"false"     {return 'Tk_false';}
-"String"    {return 'Tk_String';}
-"for"       {return 'Tk_for';}
-"while"     {return 'Tk_while';}
-"do"        {return 'Tk_do';}
-"if"        {return 'Tk_if';}
-"else"      {return 'Tk_else';}
-"break"     {return 'Tk_break';}
-"continue"  {return 'Tk_continue';}
-"return"    {return 'Tk_return';}
-"System"    {return 'Tk_System';}
-"out"       {return 'Tk_out';}
-"print"     {return 'Tk_print';}
-"println"   {return 'Tk_println';}
+"public"    {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_public';}
+"class"     {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'TK_class';}
+"main"      {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_main'}
+"interface" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_interface';}
+"void"      {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_void';}
+"static"    {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_static';}
+"int"       {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_int';}
+"double"    {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_double';}
+"char"      {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_char';}
+"boolean"   {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_boolean';}
+"true"      {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_true';}
+"false"     {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_false';}
+"String"    {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_String';}
+"for"       {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_for';}
+"while"     {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_while';}
+"do"        {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_do';}
+"if"        {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_if';}
+"else"      {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_else';}
+"break"     {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_break';}
+"continue"  {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_continue';}
+"return"    {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_return';}
+"System"    {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_System';}
+"out"       {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_out';}
+"print"     {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_print';}
+"println"   {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"RESERVADA",""+yytext);return 'Tk_println';}
 
 
 //**********************************************
 // SIMBOLOS  RECONOCIDOS POR EL LENGUAJE JAVA 20
-"{" {return '{';}
-"}" {return '}';}
-"(" {return '(';}
-")" {return ')';}
-"[" {return '[';}
-"]" {return ']';}
-"," {return ',';}
-"." {return '.';}
-";" {return ';';}
-"<" {return '<';}
-">" {return '>';}
-"&" {return '&';}
-"|" {return '|';}
-"!" {return '!';}
-"^" {return '^';}
-"=" {return '=';}
-"+" {return '+';}
-"-" {return '-';}
-"*" {return '*';}
-"/" {return '/';}
+"{" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '{';}
+"}" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '}';}
+"(" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '(';}
+")" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return ')';}
+"[" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '[';}
+"]" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return ']';}
+"," {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return ',';}
+"." {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '.';}
+";" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return ';';}
+"<" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '<';}
+">" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '>';}
+"&" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '&';}
+"|" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '|';}
+"!" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '!';}
+"^" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '^';}
+"=" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '=';}
+"+" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '+';}
+"-" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '-';}
+"*" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '*';}
+"/" {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"SIMBOLO",""+yytext);return '/';}
 
 
 
 
 //  secuencia para aceptar un identificador letras,numero y _ inicio o en medio
-[a-zA-Z_][a-zA-Z0-9_]*  {return 'Tk_identificador';}
+[a-zA-Z_][a-zA-Z0-9_]*  {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"IDENTIFICADOR",""+yytext);return 'Tk_identificador';}
 
 
 
 
 // captura para erroles lexico , cualquier caracter, excepto los que ya definimos
-.   {console.log('ERROR LEXICO:  '+yytext);
-listaErroresLexicos.push(["Tipo: "+yytext,"Fila: "+yylloc.first_line,
-"Columna: "+yylloc.first_column,"Descripcion: El caracter "+yytext+" no pertenece al lenguaje"]);
-}
+.   {addErrorLexico("Lexico",yylloc.first_line,yylloc.first_column,"El caracter "+yytext+" no pertenece al lenguaje");}
 
 
 
@@ -156,7 +163,7 @@ listaErroresLexicos.push(["Tipo: "+yytext,"Fila: "+yylloc.first_line,
 //**************************************** DONDE ARRANCA LA GRAMATICA ********************************************
 INICIO: 
 EOF         {return 'Archivo Vacio';}
-| JAVA  EOF {console.log($1);}
+| JAVA  EOF {console.log(JSON.stringify(listaReporteToken));console.log($1);}
 | {}
 ;
 
@@ -166,9 +173,9 @@ EOF         {return 'Archivo Vacio';}
 JAVA:
 CLASE           {$$=`${$1}`;}
 |INTERFACE      {}
-|JAVA CLASE     {$$=`${$1}\n${$2}`;}
-|JAVA INTERFACE {}
 |ERROR          {$$=``;}
+|JAVA CLASE     {$$=`${$1}${$2}`;}
+|JAVA INTERFACE {}
 ;
 
 

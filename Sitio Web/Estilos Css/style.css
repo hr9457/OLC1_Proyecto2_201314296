@@ -1,0 +1,196 @@
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    background-color: #dcdde1;
+}
+
+
+nav{
+    background: #487eb0;
+    height: 60px;
+    width: 100%;
+}
+
+nav p{
+    font-family: Arial;
+    color: white;
+    font-size: 25px;
+    line-height: 55px;
+    float: left;
+    padding: 0px 20px;
+}
+
+nav ul{
+    float: left;
+}
+
+nav ul li{
+    float: left;
+    list-style: none;
+    position: relative;
+    padding: 0px 20px;
+}
+
+/*principales*/
+nav ul li a{
+    display: block;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 22px;
+    padding: 14px 30px;
+    text-decoration: none;
+}
+
+/* listas desplegables */
+nav ul li ul{
+    display: none;
+    position: absolute;
+    background-color: #487eb0;
+}
+
+nav ul li:hover ul{
+    display: block;
+}
+
+nav ul li ul a{
+    width: 180px;
+}
+
+
+nav ul li ul a:hover{
+    background-color:#40739e ;
+    color: #353b48;
+}
+
+
+
+/*     contenedor para codigo */
+/* estilo de las paginas principales */
+.tabs{
+    border: 1px solid black;
+    width: 50% 10%;
+    height:auto;
+    padding:5px;
+    background:#B4BDD1;
+}
+
+
+.container{
+    float: left;
+    height: 500px;
+    width: 43%;    
+    margin: 3px;
+    margin-top: 20px;
+    padding: 30px 30px;
+}
+
+.tabs{
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+    background:#57606f;
+    border-bottom: 5px #e67e22 solid;
+}
+
+.tabs li{
+    display: inline-block;
+    margin:0;
+    padding: 10px 20px 5px 20px;
+    cursor: pointer;
+
+    font-size:1.2em;
+    line-height:2em;
+    color:#FFF;
+}
+
+.tabs li:hover {
+    background:#d35400;
+    }
+
+.tabs li.current{
+    background: #e67e22;
+    color: #FFF;
+}
+
+.tab-content{
+    display: none;
+    background: #ededed;
+    height: 150%;
+    padding: 15px;
+    line-height:1.4;
+}
+
+.tab-content.current{
+    display: inherit;
+}
+
+
+
+/*areas de texto para insertar codigo*/
+.txtArea1{
+    width: 98%;
+    height: 95%;
+}
+
+/*areas de texto para insertar codigo*/
+.txtArea2{
+    width: 98%;
+    height: 95%;
+}
+
+/*areas de texto para insertar codigo*/
+.txtArea3{
+    width: 98%;
+    height: 95%;
+}
+
+/*areas de texto para insertar codigo*/
+.txtArea4{
+    width: 98%;
+    height: 95%;
+}
+
+.traductores{
+    float: right;    
+    width: 45%;
+    height: 780px;
+    margin-top: 40px;
+    margin-right: 50px;
+    padding: 30px 30px;
+}
+
+.js{
+    width: 100%;
+    height: 45%;
+    margin-bottom: 60px;
+    background:#ededed;
+}
+
+.py{
+    width: 100%;
+    height: 45%;
+    background:#ededed;
+}
+
+
+/*
+* entrada de textos
+*/
+.txtJavascript{
+    width: 100%;
+    height: 100%;
+}
+
+.txtpython{
+    width: 100%;
+    height: 100%;
+}
+
+h2{
+    font-family: monospace;
+}
+
