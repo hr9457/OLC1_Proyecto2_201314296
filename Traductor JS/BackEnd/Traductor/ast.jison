@@ -20,23 +20,9 @@
 
 // EXPRESIONES REGULARES  PARA ACEPTACION DE CADENAS ESPECIALES POR EL LENGUAJE JAVA 6
 
-
 // espacios, tabulaciones, nuevas lines
 \s+  {}
 
-
-//------------------------------------------- aceptacion de numeros decimales
-[0-9]+(.[0-9])+\b           {return 'Tk_decimal';}
-
-//------------------------------------------- aceptacion de digitos de 0 a 9
-[0-9]+\b                    {return 'Tk_digito';}
-
-
-//-------------------------------------------- aceptacion de string
-\".*\"                      {return 'Tk_cadena';}
-
-//------------------------------------------- acpetacion de char
-\'.*\'                      {return 'Tk_cadenaChar';}
 
 //--------------------------------------------  comentario unilinea
 \/\/.*                      {}
@@ -101,9 +87,21 @@
 
 
 
+//-------------------------------------------- aceptacion de string
+\"[^\"]*\"                      {return 'Tk_cadena';}
+
+//------------------------------------------- acpetacion de char
+\'.*\'                          {return 'Tk_cadenaChar';}
+
+//------------------------------------------- aceptacion de numeros decimales
+[0-9]+("."[0-9]+)?\b            {return 'Tk_decimal';}
+
+//------------------------------------------- aceptacion de digitos de 0 a 9
+[0-9]+\b                        {return 'Tk_digito';}
 
 //  secuencia para aceptar un identificador letras,numero y _ inicio o en medio
-[a-zA-Z_][a-zA-Z0-9_]*  {return 'Tk_identificador';}
+[a-zA-Z_][a-zA-Z0-9_]*          {return 'Tk_identificador';}
+
 
 
 
@@ -149,318 +147,318 @@
 
 //**************************************** DONDE ARRANCA LA GRAMATICA ********************************************
 INICIO: 
-EOF         {return 'Archivo Vacio';}
-| JAVA  EOF {console.log(JSON.stringify(listaReporteToken));}
-| {}
+EOF             { return 'Archivo Vacio'; }
+| JAVA  EOF     { return { "name": "INCIO", "children":$1 }; }
 ;
 
 
 //*****************************************************************************************************************
 //*********************** GRAMATICA DE JAVA todo lo aceptado en el orden de java **********************************
 JAVA:
-CLASE           {}
-|INTERFACE      {}
-|ERROR          {}
-|JAVA CLASE     {}
-|JAVA INTERFACE {}
+CLASE           { $$=[{"name":"CLASE","children":$1}]; }
+|INTERFACE      { $$=[{"name":"INTER","children":$1}]; }
+|JAVA CLASE     { $$=[{"name":"JAVA","children":$1},{"name":"CLASE","children":$2}];  }
+|JAVA INTERFACE { $$=[{"name":"JAVA","children":$1},{"name":"INTER","children":$2}];  }
 ;
 
 
 
 //*************************** CLASES QUE PUEDEN EXISTIR EN JAVA PUEDE IR DE TODO **********************************
 CLASE:
-ESTRUCTURA-CLASE {}
+ESTRUCTURA-CLASE { $$=$1 }
 ;
 
 
 //*********************************** INTERFACES ACEPTADAS EN JAVA *************************************************
 INTERFACE:
-ESTRUCTURA-INTERFACE {}
+ESTRUCTURA-INTERFACE { $$=$1 }
 ;
 
 
 //**************** ESTRUCTURAS PERMITIAS DENTRO DE UNA CLASE DE JAVA ************************************************
 ESTRUCTURA-CLASE:
-'Tk_public' 'TK_class' 'Tk_identificador' '{' '}'                           {}
-|'Tk_public' 'TK_class' 'Tk_identificador' '{'  INSTRUCCIONES-CLASE  '}'    {}
+'Tk_public' 'TK_class' 'Tk_identificador' '{' '}'                           { $$=[{"name":"public"},{"name":"class"},{"name":$3},{"name":"{"},{"name":"}"}]; }
+|'Tk_public' 'TK_class' 'Tk_identificador' '{'  INSTRUCCIONES-CLASE  '}'    { $$=[{"name":"public"},{"name":"class"},{"name":$3},{"name":"{"},{"name":"INSTRU","children":$5},{"name":"}"}]; }
+| ERROR '}'                                                                 { $$=[]; }
 ;
 
 
 //******************* ESTRUCTURA PERMITIDA DENTRO DE UNA INTERFACE DE JAVA *******************************************
 ESTRUCTURA-INTERFACE:
-'Tk_public' 'Tk_interface' 'Tk_identificador' '{' '}'
-|'Tk_public' 'Tk_interface' 'Tk_identificador' '{' INSTRUCCIONES-INTERFACE '}' 
+'Tk_public' 'Tk_interface' 'Tk_identificador' '{' '}'                               {  $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5}]; }
+|'Tk_public' 'Tk_interface' 'Tk_identificador' '{' INSTRUCCIONES-INTERFACE '}'      {  $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":"INST","children":$5},{"name":$6}]; }
 ;
 
 
 // METODO MAIN DE JAVA
 // METODO MAIN DE JAVA
 METODO-MAIN:
-'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' '}'                      {}
-|'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' INSTRUCCIONES-MAIN '}'  {}
+'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' '}'                      { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":"("},{"name":$6},{"name":"["},{"name":"]"},{"name":$9},{"name":"{"},{"name":"}"}]; }
+|'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' INSTRUCCIONES-MAIN '}'  { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":"("},{"name":$6},{"name":"["},{"name":"]"},{"name":$9},{"name":"{"},{"name":"INST","children":$12},{"name":"}"}];   }
+|error '}' {$$=[];}
 ;
 
 
 //*************************************** METODOS ACEPTADOS EN JAVA ************************************************************************
 METODO:
-'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' '{' '}'                                     {}
-|'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' '{'  '}'                        {}
-|'Tk_public' TIPO-RETORNO 'Tk_identificador' '('  ')' '{' INSTRUCCIONES-METODO  '}'             {}
-|'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' '{' INSTRUCCIONES-METODO  '}'   {}
+'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' '{' '}'                                     {  $$=[{"name":"public"},{"name":"TIPO","children":$2},{"name":$3},{"name":"("},{"name":")"},{"name":"{"},{"name":"}"}];  }
+|'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' '{'  '}'                        {  $$=[{"name":"public"},{"name":"TIPO","children":$2},{"name":$3},{"name":"("},{"name":"PARAM","children":$5},{"name":")"},{"name":"{"},{"name":"}"}];  }
+|'Tk_public' TIPO-RETORNO 'Tk_identificador' '('  ')' '{' INSTRUCCIONES-METODO  '}'             {  $$=[{"name":"public"},{"name":"TIPO","children":$2},{"name":$3},{"name":"("},{"name":")"},{"name":"{"},{"name":"INSTR","children":$7},{"name":"}"}];  }
+|'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' '{' INSTRUCCIONES-METODO  '}'   {  $$=[{"name":"public"},{"name":"TIPO","children":$2},{"name":$3},{"name":"("},{"name":"PARAM","children":$5},{"name":")"},{"name":"{"},{"name":"INSTR","children":$8},{"name":"}"}];  }
 ;
 
 
 //*************************************** FUNCIONES ACEPTDAS EN JAVA ***************************************
 FUNCION:
-'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                 {}
-|'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'     {}
+'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                 { $$=[{"name":$1},{"name":"TIPO","children":$2},{"name":$3},{"name":$4},{"name":$5},{"name":$6}]; }
+|'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'     { $$=[{"name":$1},{"name":"TIPO","children":$2},{"name":$3},{"name":$4},{"name":"PARAM","children":$5},{"name":$6},{"name":$7}]; }
 ;
 
 
 //***************** TIPO DE RETORNOS PARA FUNCIONES Y METODOS ***************************
 TIPO-RETORNO:
-Tk_void         {}
-|Tk_int         {}
-|Tk_boolean     {}
-|Tk_double      {}
-|Tk_String      {}
-|Tk_char        {}
+Tk_void         { $$=[{"name":$1}]; }
+|Tk_int         { $$=[{"name":$1}]; }
+|Tk_boolean     { $$=[{"name":$1}]; }
+|Tk_double      { $$=[{"name":$1}]; }
+|Tk_String      { $$=[{"name":$1}]; }
+|Tk_char        { $$=[{"name":$1}]; }
 ;
 
 //*************** ESTRUTURA DE LOS PARAMETROS QUE PUEDE RECIBIER UN METODO Y FUNCIONES *************
 PARAMETROS:
-TIPO-VARIABLE Tk_identificador                  {}
-|PARAMETROS ',' TIPO-VARIABLE Tk_identificador  {}
+TIPO-VARIABLE Tk_identificador                  {  $$=[{"name":"TIPO","children":$1},{"name":$2}]; }
+|PARAMETROS ',' TIPO-VARIABLE Tk_identificador  {  $$=[{"name":"PARAM","children":$1},{"name":","},{"name":"TIPO","children":$3},{"name":$4}];  }
 ;
 
 
 //******************INSTRUCCIONES ACEPTADAS DENTRO DE UNA CLASE********************
 INSTRUCCIONES-CLASE:
-VARIABLE                            {}
-|ASIGNACION-A                       {}
-|METODO                             {}
-|METODO-MAIN                        {}
-|FUNCION                            {}
-|INSTRUCCIONES-CLASE METODO         {}
-|INSTRUCCIONES-CLASE FUNCION        {}
-|INSTRUCCIONES-CLASE VARIABLE       {}
-|INSTRUCCIONES-CLASE ASIGNACION-A   {}
-|INSTRUCCIONES-CLASE METODO-MAIN    {}
+VARIABLE                            { $$=[{"name":"VAR","children":$1}];    }
+|ASIGNACION-A                       { $$= [{"name":"ASIG","children":$1}];  }
+|METODO                             { $$= [{"name":"MET","children":$1}];   }
+|METODO-MAIN                        { $$= [{"name":"MET","children":$1}];   }
+|FUNCION                            { $$= [{"name":"FUN","children":$1}];   }
+|INSTRUCCIONES-CLASE METODO         { $$= [{"name":"INSTRU","children":$1},{"name":"MET","children":$2}]; }
+|INSTRUCCIONES-CLASE FUNCION        { $$= [{"name":"INSTRU","children":$1},{"name":"FUN","children":$2}]; }
+|INSTRUCCIONES-CLASE VARIABLE       { $$= [{"name":"INSTRU","children":$1},{"name":"VAR","children":$2}]; }
+|INSTRUCCIONES-CLASE ASIGNACION-A   { $$= [{"name":"INSTRU","children":$1},{"name":"ASIG","children":$2}]; }
+|INSTRUCCIONES-CLASE METODO-MAIN    { $$= [{"name":"INSTRU","children":$1},{"name":"MAIN","children":$2}]; }
 ;
 
 
 // INSTRUCCIONES ACEPTADAS DENTRO DE UN METODO MAIN
 INSTRUCCIONES-MAIN:
-VARIABLE                                {}
-|ASIGNACION-A                           {}
-|LLAMADA-METODO                         {}
-|FUNCION-IF                             {}
-|FUNCION-FOR                            {}
-|FUNCION-WHILE                          {}
-|FUNCION-DOWHILE                        {}
-|IMPRESION                              {}
-|IMPRESION-SALTO                        {}
-|RETORNO                                {}
-|INSTRUCCIONES-MAIN VARIABLE            {}
-|INSTRUCCIONES-MAIN ASIGNACION-A        {}
-|INSTRUCCIONES-MAIN LLAMADA-METODO      {}
-|INSTRUCCIONES-MAIN FUNCION-IF          {}
-|INSTRUCCIONES-MAIN FUNCION-FOR         {}
-|INSTRUCCIONES-MAIN FUNCION-WHILE       {}
-|INSTRUCCIONES-MAIN FUNCION-DOWHILE     {}
-|INSTRUCCIONES-MAIN IMPRESION           {}
-|INSTRUCCIONES-MAIN IMPRESION-SALTO     {}
-|INSTRUCCIONES-MAIN RETORNO             {}
+VARIABLE                                { $$=[{"name":"VAR","children":$1} ];  }
+|ASIGNACION-A                           { $$=[{"name":"ASIG","children":$1} ]; }
+|LLAMADA-METODO                         { $$=[{"name":"MET","children":$1} ];  }
+|FUNCION-IF                             { $$=[{"name":"FUN","children":$1} ];  }
+|FUNCION-FOR                            { $$=[{"name":"FUN","children":$1} ];  }
+|FUNCION-WHILE                          { $$=[{"name":"FUN","children":$1} ];  }
+|FUNCION-DOWHILE                        { $$=[{"name":"FUN","children":$1} ];  }
+|IMPRESION                              { $$=[{"name":"PRIN","children":$1} ]; }
+|IMPRESION-SALTO                        { $$=[{"name":"PRIN","children":$1} ]; }
+|RETORNO                                { $$=[{"name":"RETO","children":$1} ]; }
+|INSTRUCCIONES-MAIN VARIABLE            { $$=[{"name":"INST","children":$1},{"name":"VAR","children":$2} ];  }
+|INSTRUCCIONES-MAIN ASIGNACION-A        { $$=[{"name":"INST","children":$1},{"name":"ASIG","children":$2} ]; }
+|INSTRUCCIONES-MAIN LLAMADA-METODO      { $$=[{"name":"INST","children":$1},{"name":"MET","children":$2} ];  }
+|INSTRUCCIONES-MAIN FUNCION-IF          { $$=[{"name":"INST","children":$1},{"name":"FUN","children":$2} ];  }
+|INSTRUCCIONES-MAIN FUNCION-FOR         { $$=[{"name":"INST","children":$1},{"name":"FUN","children":$2} ];  }
+|INSTRUCCIONES-MAIN FUNCION-WHILE       { $$=[{"name":"INST","children":$1},{"name":"FUN","children":$2} ];  }
+|INSTRUCCIONES-MAIN FUNCION-DOWHILE     { $$=[{"name":"INST","children":$1},{"name":"FUN","children":$2} ];  }
+|INSTRUCCIONES-MAIN IMPRESION           { $$=[{"name":"INST","children":$1},{"name":"PRIN","children":$2} ]; }
+|INSTRUCCIONES-MAIN IMPRESION-SALTO     { $$=[{"name":"INST","children":$1},{"name":"PINT","children":$2} ]; }
+|INSTRUCCIONES-MAIN RETORNO             { $$=[{"name":"INST","children":$1},{"name":"RETO","children":$2} ]; }
 ;
 
 
 //**************************** INSTRUCCIONES QUE PUEDE RECIBIR UNA INTERFACE EN JAVA ***********************************
 INSTRUCCIONES-INTERFACE:
-'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                                         {}
-|'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'                             {}
-|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                {}
-|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'     {}
-| ERROR ';'
+'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                                         { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5},{"name":$6}]; }
+|'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'                             { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":"PARA","children":$5},{"name":$6},{"name":$6}]; }
+|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                { $$=[{"name":"INTER","children":$1},{"name":$2},{"name":"TIPO","children":$3},{"name":$4},{"name":$5},{"name":$6},{"name":$7}]; }
+|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'     { $$=[{"name":"INTER","children":$1},{"name":$2},{"name":"TIPO","children":$3},{"name":$4},{"name":$5},{"name":"PARA","children":$6},{"name":$7},{"name":$8}]; }
+|error ';'                                                                                      { $$=[{}];  }
 ;
 
 
 //********************* todas las instrucciones aceptadas dentro de los metodos *****************************************
 INSTRUCCIONES-METODO:
-VARIABLE                                            {$$=`\t${$1}`;}
-|ASIGNACION-A                                       {$$=`\t${$1}`;}
-|FUNCION-IF                                         {$$=`\t${$1}`;}
-|FUNCION-FOR                                        {$$=`\t${$1}`;}
-|FUNCION-WHILE                                      {$$=`\t${$1}`;}
-|FUNCION-DOWHILE                                    {$$=`\t${$1}`;}
-|LLAMADA-METODO                                     {$$=`\t${$1}`;}
-|IMPRESION                                          {$$=`\t${$1}`;}
-|IMPRESION-SALTO                                    {$$=`\t${$1}`;}
-|RETORNO                                            {}
-|Tk_identificador '+' '+' ';'                       {}
-|INSTRUCCIONES-METODO VARIABLE                      {}
-|INSTRUCCIONES-METODO ASIGNACION-A                  {}
-|INSTRUCCIONES-METODO FUNCION-IF                    {}
-|INSTRUCCIONES-METODO FUNCION-FOR                   {}
-|INSTRUCCIONES-METODO FUNCION-WHILE                 {}
-|INSTRUCCIONES-METODO FUNCION-DOWHILE               {}
-|INSTRUCCIONES-METODO LLAMADA-METODO                {}
-|INSTRUCCIONES-METODO IMPRESION                     {}
-|INSTRUCCIONES-METODO IMPRESION-SALTO               {}
-|INSTRUCCIONES-METODO RETORNO                       {}
-|INSTRUCCIONES-METODO Tk_identificador '+' '+' ';'  {}
+VARIABLE                                            { $$=[{"name":"VAR","children":$1}];   }
+|ASIGNACION-A                                       { $$=[{"name":"ASIG","children":$1}];  }
+|FUNCION-IF                                         { $$=[{"name":"FUNC","children":$1}];  }
+|FUNCION-FOR                                        { $$=[{"name":"FUNC","children":$1}];  }
+|FUNCION-WHILE                                      { $$=[{"name":"FUNC","children":$1}];  }
+|FUNCION-DOWHILE                                    { $$=[{"name":"FUNC","children":$1}];  }
+|LLAMADA-METODO                                     { $$=[{"name":"MET","children":$1}];    }
+|IMPRESION                                          { $$=[{"name":"PRINT","children":$1}];  }
+|IMPRESION-SALTO                                    { $$=[{"name":"PRINT","children":$1}];  }
+|RETORNO                                            { $$=[{"name":"RET","children":$1}];    }
+|Tk_identificador '+' '+' ';'                       { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4}]; }
+|INSTRUCCIONES-METODO VARIABLE                      { $$= [{"name":"INSTRU","children":$1},{"name":"VAR","children":$2}];  }
+|INSTRUCCIONES-METODO ASIGNACION-A                  { $$= [{"name":"INSTRU","children":$1},{"name":"ASIG","children":$2}]; }
+|INSTRUCCIONES-METODO FUNCION-IF                    { $$= [{"name":"INSTRU","children":$1},{"name":"FUNC","children":$2}]; }
+|INSTRUCCIONES-METODO FUNCION-FOR                   { $$= [{"name":"INSTRU","children":$1},{"name":"FUNC","children":$2}]; }
+|INSTRUCCIONES-METODO FUNCION-WHILE                 { $$= [{"name":"INSTRU","children":$1},{"name":"FUNC","children":$2}]; }
+|INSTRUCCIONES-METODO FUNCION-DOWHILE               { $$= [{"name":"INSTRU","children":$1},{"name":"FUNC","children":$2}]; }
+|INSTRUCCIONES-METODO LLAMADA-METODO                { $$= [{"name":"INSTRU","children":$1},{"name":"MET","children":$2}];  }
+|INSTRUCCIONES-METODO IMPRESION                     { $$= [{"name":"INSTRU","children":$1},{"name":"PRINT","children":$2}]; }
+|INSTRUCCIONES-METODO IMPRESION-SALTO               { $$= [{"name":"INSTRU","children":$1},{"name":"PRINT","children":$2}]; }
+|INSTRUCCIONES-METODO RETORNO                       { $$= [{"name":"INSTRU","children":$1},{"name":"RET","children":$2}];  }
+|INSTRUCCIONES-METODO Tk_identificador '+' '+' ';'  { $$= [{"name":"INSTRU","children":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5}]; }
 ;
 
 
 // ASIGNACIONACIONES A UNA VARIABLE DECLARADAS
 //********************* ASIGNACION A VARIABLES YA DECLARADAS ********************
 ASIGNACION-A:
-Tk_identificador '=' EXPRESION ';' {}
+Tk_identificador '=' EXPRESION ';' { $$ = [ {"name":$1},{"name":"="},{"name":"EXP","children":$3},{"name":";"} ]; }
 ;
 
 
 //********************** ESTRUCTURA DE UNA VARIABLE ******************************
 VARIABLE:
-TIPO-VARIABLE DECLARACION ';' {}
-| ERROR ';'                   {}
+TIPO-VARIABLE DECLARACION ';' { $$=[{"name":"TIPO","children":$1},{"name":"DEC","children":$2},{"name":";"}]; }
+| ERROR ';'                   { $$=[]; }
 ;
 
 
 //******************* TIPO DE VARIABLES ACEPTADAS EN JAVA **************************
 TIPO-VARIABLE:
-Tk_int          {}
-|Tk_boolean     {}
-|Tk_double      {}
-|Tk_String      {}
-|Tk_char        {}
+Tk_int          { $$=[{"name":$1}]; }
+|Tk_boolean     { $$=[{"name":$1}]; }
+|Tk_double      { $$=[{"name":$1}]; }
+|Tk_String      { $$=[{"name":$1}]; }
+|Tk_char        { $$=[{"name":$1}]; }
 ;
 
 
 //******************* DECLARACION DE UNA O VARIAS VARIABLES ***************************
 DECLARACION:
-ASIGNACION                      {}
-| DECLARACION ',' ASIGNACION    {}
+ASIGNACION                      { $$=[{"name":"ASIG","children":$1}]; }
+| DECLARACION ',' ASIGNACION    { $$=[{"name":"DEC", "children":$1},{"name":","},{"name":"ASIG","children":$3}]; }
 ;
 
 
 //***************** TIPOS DE ASIGNACION QUE SE LE PUEDE HACER A UNA VARIABLE ***********
 ASIGNACION:
-Tk_identificador '=' EXPRESION  {}
-|Tk_identificador               {}
+Tk_identificador '=' EXPRESION  { $$=[{"name":$1},{"name":"="},{"name":"EXP","children":$3}]; }
+|Tk_identificador               { $$=[{"name":$1}]; }
 ;
 
 //***************************** EXPRESIONES POSIBLE EN JAVA ******************************
 EXPRESION:
-EXPRESION '&' '&' EXPRESION     {}
-|EXPRESION '|' '|' EXPRESION    {}
-|EXPRESION '>' '=' EXPRESION    {}
-|EXPRESION '<' '=' EXPRESION    {}
-|EXPRESION '=' '=' EXPRESION    {}
-|EXPRESION '!' '=' EXPRESION    {}
-|EXPRESION '+' '+'              {}
-|EXPRESION '-' '-'              {}
-|EXPRESION '^' EXPRESION 
-|EXPRESION '>' EXPRESION        {}
-|EXPRESION '<' EXPRESION        {}
-|EXPRESION '*' EXPRESION        {}
-|EXPRESION '/' EXPRESION        {}
-|EXPRESION '+' EXPRESION        {}
-|EXPRESION '-' EXPRESION        {}
-|'!' EXPRESION                  {}
-|'-' EXPRESION %prec NEGATIVOS  {}    
-|VALOR                          {}
-|Tk_identificador               {}
+EXPRESION '&' '&' EXPRESION     { $$=[{"name":"EXP","children":$1},{"name":"&"},{"name":"&"},{"name":"EXP","children":$4}]; }
+|EXPRESION '|' '|' EXPRESION    { $$=[{"name":"EXP","children":$1},{"name":"|"},{"name":"|"},{"name":"EXP","children":$4}]; }
+|EXPRESION '>' '=' EXPRESION    { $$=[{"name":"EXP","children":$1},{"name":">"},{"name":"="},{"name":"EXP","children":$4}]; }
+|EXPRESION '<' '=' EXPRESION    { $$=[{"name":"EXP","children":$1},{"name":"<"},{"name":"="},{"name":"EXP","children":$4}]; }
+|EXPRESION '=' '=' EXPRESION    { $$=[{"name":"EXP","children":$1},{"name":"="},{"name":"="},{"name":"EXP","children":$4}]; }
+|EXPRESION '!' '=' EXPRESION    { $$=[{"name":"EXP","children":$1},{"name":"!"},{"name":"="},{"name":"EXP","children":$4}]; }
+|EXPRESION '+' '+'              { $$=[{"name":"EXP","children":$1},{"name":"+"},{"name":"+"}]; }
+|EXPRESION '-' '-'              { $$=[{"name":"EXP","children":$1},{"name":"-"},{"name":"-"}]; }
+|EXPRESION '^' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":"^"},{"name":"EXP","children":$3}]; }
+|EXPRESION '>' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":">"},{"name":"EXP","children":$3}]; }
+|EXPRESION '<' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":"<"},{"name":"EXP","children":$3}]; }
+|EXPRESION '*' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":"*"},{"name":"EXP","children":$3}]; }
+|EXPRESION '/' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":"/"},{"name":"EXP","children":$3}]; }
+|EXPRESION '+' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":"+"},{"name":"EXP","children":$3}]; }
+|EXPRESION '-' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":"-"},{"name":"EXP","children":$3}]; }
+|'!' EXPRESION                  { $$=[{"name":"!"},{"name":"EXP","children":$2}]; }
+|'-' EXPRESION %prec NEGATIVOS  { $$=[{"name":"-"},{"name":"EXP","children":$2}]; }    
+|VALOR                          { $$=[{"name":"VALOR","children":$1}]; }
 ;
 
 
 //********************** VALOR QUE SE LE PUEDE ASIGNAR DENTRO DE JAVA *************************
 VALOR:
-Tk_digito       {}
-|Tk_decimal     {}
-|Tk_cadena      {}
-|Tk_cadenaChar  {}
-|Tk_true        {}
-|Tk_false       {}
+Tk_digito           {  $$=[{"name":$1}];  }
+|Tk_decimal         {  $$=[{"name":$1}];  }
+|Tk_cadena          {  $$=[{"name":$1}];  }
+|Tk_cadenaChar      {  $$=[{"name":$1}];  }
+|Tk_true            {  $$=[{"name":$1}];  }
+|Tk_false           {  $$=[{"name":$1}];  }
+|Tk_identificador   {  $$=[{"name":$1}];  }
 ;
 
 
 
 //********************************** FUNCION IF PARA JAVA ************************************
 FUNCION-IF:
-IF ELSE         {}
+IF                  { $$=[{"name":"IF","children":$1}]; }
+|IF ELSE            { $$=[{"name":"IF","children":$1},{"name":"ELSE","children":$2}]; }
 ;
 
 //****************************** puede venir un if  o un else if varias veces
 IF:
-Tk_if '(' EXPRESION   ')' '{'   INSTRUCCIONES-CICLOS   '}'                  {}
-|Tk_if '(' EXPRESION ')' '{'   '}'                                          {}
-| IF 'Tk_else' Tk_if '('  EXPRESION   ')' '{'  INSTRUCCIONES-CICLOS  '}'    {}
-| IF 'Tk_else' Tk_if '(' EXPRESION ')' '{'   '}'                            {}
+Tk_if '(' EXPRESION   ')' '{'   INSTRUCCIONES-CICLOS   '}'                  { $$=[ {"name":$1},{"name":$2},{"name":"EXP","children":$3},{"name":$4},{"name":$5},{"name":"INST","children":$6},{"name":$7} ]; }
+|Tk_if '(' EXPRESION ')' '{'   '}'                                          { $$=[{"name":$1},{"name":$2},{"name":"EXP","children":$3},{"name":$4},{"name":$5},{"name":$6}]; }
+| IF 'Tk_else' Tk_if '('  EXPRESION   ')' '{'  INSTRUCCIONES-CICLOS  '}'    { $$=[ {"name":"FUN","children":$1},{"name":$2},{"name":$3},{"name":$4},{"name":"EXP","children":$5},{"name":$6},{"name":$7},{"name":"INS","children":$8},{"name":$9} ]; }
+| IF 'Tk_else' Tk_if '(' EXPRESION ')' '{'   '}'                            { $$=[{"name":"FUN","children":$1},{"name":$2},{"name":$3},{"name":$4},{"name":"EXP","children":$5},{"name":$6},{"name":$7},{"name":$8}]; }
 ;
 
 
 
 //******************************* ELSE PUEDE O NO PUEDE VENIR
 ELSE:
-Tk_else '{'  INSTRUCCIONES-CICLOS '}'   {}
-|Tk_else '{'    '}'                     {}
-|                                       {}
+Tk_else '{'  INSTRUCCIONES-CICLOS '}'   { $$=[ {"name":$1},{"name":$2},{"name":"INST","children":$3},{"name":$4} ]; }
+|Tk_else '{'    '}'                     { $$=[{"name":$1},{"name":$2},{"name":$3}]; }
 ;
-
+//************************************************************************************************ 
 
 
 
 //**************************** estructura de la funcion for aceptada en java *********************************************
 FUNCION-FOR:
-Tk_for '(' DEC ';' EXPRESION ';' EXPRESION ')' '{'  INSTRUCCIONES-CICLOS  '}'   {}
-|Tk_for '(' DEC ';' EXPRESION ';' EXPRESION ')' '{' '}'                         {}
+Tk_for '(' DEC ';' EXPRESION ';' EXPRESION ')' '{'  INSTRUCCIONES-CICLOS  '}'   { $$=[{"name":$1},{"name":$2},{"name":"DEC","children":$3},{"name":$4},{"name":"EXP","children":$5},{"name":$6},{"name":"EXP","children":$7},{"name":$8},{"name":$9},{"name":"INST","name":$10},{"name":$11} ]; }
+|Tk_for '(' DEC ';' EXPRESION ';' EXPRESION ')' '{' '}'                         { $$=[{"name":$1},{"name":$2},{"name":"DEC","children":$3},{"name":$4},{"name":"EXP","children":$5},{"name":$6},{"name":"EXP","children":$7},{"name":$8},{"name":$9},{"name":$10}]; }
 ;
 
 
 //********** estrutura de dec que puede tener un for va dentro del for **************************************************** 
 DEC:
-TIPO-VARIABLE Tk_identificador '=' VALOR    {}
-|Tk_identificador '=' VALOR                 {}
-|Tk_identificador                           {}
+TIPO-VARIABLE Tk_identificador '=' VALOR    { $$=[{"name":"TIPO","children":$1},{"name":$2},{"name":$3},{"name":"VALOR","children":$4}]; }
+|Tk_identificador '=' VALOR                 { $$=[{"name":$1},{"name":$2},{"name":"VAL","children":$3}]; }
+|Tk_identificador                           { $$=[{"name":$1}]; }
 ;
 
 
 //*************************************************** estructura de un while ************************************************
 FUNCION-WHILE:
-Tk_while '(' EXPRESION ')' '{'  INSTRUCCIONES-CICLOS  '}'   {}
-|Tk_while '(' EXPRESION ')' '{'  '}'                        {}
+Tk_while '(' EXPRESION ')' '{'  INSTRUCCIONES-CICLOS  '}'   { $$=[ {"name":$1},{"name":$2},{"name":"EXP","children":$3},{"name":$4},{"name":$5},{"name":"INST","children":$6},{"name":$7} ]; }
+|Tk_while '(' EXPRESION ')' '{'  '}'                        { $$=[{"name":$1},{"name":$2},{"name":"EXP","children":$3},{"name":$4},{"name":$5},{"name":$6}]; }
 ;
 
 
 // estructura de de un do while en java
 FUNCION-DOWHILE:
-Tk_do '{'  INSTRUCCIONES-CICLOS  '}' Tk_while '(' EXPRESION ')' ';'     {}
-|Tk_do '{'  '}' Tk_while '(' EXPRESION ')' ';'                          {}
+Tk_do '{'  INSTRUCCIONES-CICLOS  '}' Tk_while '(' EXPRESION ')' ';'     { $$=[ {"name":$1},{"name":$2},{"name":"INST","children":$3},{"name":$4},{"name":$5},{"name":$6},{"name":"EXP","name":$7},{"name":$8},{"name":$9} ]; }
+|Tk_do '{'  '}' Tk_while '(' EXPRESION ')' ';'                          { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5},{"name":"EXP","children":$6},{"name":$7},{"name":$8}]; }
 ;
 
 
 
 // bloque de sentencias que pueden venir dentro de un if
 INSTRUCCIONES-CICLOS:
-VARIABLE                                            {}
-|ASIGNACION-A
-|FUNCION-IF
-|FUNCION-FOR                                        {}
-|FUNCION-WHILE
-|FUNCION-DOWHILE
-|LLAMADA-METODO
-|IMPRESION
-|IMPRESION-SALTO
-|RETORNO 
-|Tk_identificador '+' '+' ';'
-|INSTRUCCIONES-CICLOS FUNCION-IF
-|INSTRUCCIONES-CICLOS FUNCION-FOR
-|INSTRUCCIONES-CICLOS FUNCION-WHILE
-|INSTRUCCIONES-CICLOS FUNCION-DOWHILE
-|INSTRUCCIONES-CICLOS LLAMADA-METODO
-|INSTRUCCIONES-CICLOS IMPRESION
-|INSTRUCCIONES-CICLOS IMPRESION-SALTO
-|INSTRUCCIONES-CICLOS RETORNO 
-|INSTRUCCIONES-CICLOS Tk_identificador '+' '+' ';'
+VARIABLE                                            { $$=[ {"name":"VAR","children":$1} ]; }
+|ASIGNACION-A                                       { $$=[ {"name":"ASIG","children":$1} ]; }
+|FUNCION-IF                                         { $$=[ {"name":"FUN","children":$1} ]; }
+|FUNCION-FOR                                        { $$=[ {"name":"FUN","children":$1} ]; }
+|FUNCION-WHILE                                      { $$=[ {"name":"FUN","children":$1} ]; }
+|FUNCION-DOWHILE                                    { $$=[ {"name":"FUN","children":$1} ]; }
+|LLAMADA-METODO                                     { $$=[ {"name":"MET","children":$1} ]; }
+|IMPRESION                                          { $$=[ {"name":"PRIN","children":$1} ]; }
+|IMPRESION-SALTO                                    { $$=[ {"name":"PRIN","children":$1} ]; }
+|RETORNO                                            { $$=[ {"name":"RET","children":$1} ]; }
+|Tk_identificador '+' '+' ';'                       { $$=[ {"name":$1},{"name":$2},{"name":$3},{"name":$4} ]; }
+|INSTRUCCIONES-CICLOS FUNCION-IF                    { $$=[ {"name":"INST","children":$1},{"name":"FUN","children":$2} ]; }
+|INSTRUCCIONES-CICLOS FUNCION-FOR                   { $$=[ {"name":"INST","children":$1},{"name":"FUN","children":$2} ]; }
+|INSTRUCCIONES-CICLOS FUNCION-WHILE                 { $$=[ {"name":"INST","children":$1},{"name":"FUN","children":$2} ]; }
+|INSTRUCCIONES-CICLOS FUNCION-DOWHILE               { $$=[ {"name":"INST","children":$1},{"name":"FUN","children":$2} ]; }
+|INSTRUCCIONES-CICLOS LLAMADA-METODO                { $$=[ {"name":"INST","children":$1},{"name":"MET","children":$2} ]; }
+|INSTRUCCIONES-CICLOS IMPRESION                     { $$=[ {"name":"INST","children":$1},{"name":"PRIN","children":$2} ]; }
+|INSTRUCCIONES-CICLOS IMPRESION-SALTO               { $$=[ {"name":"INST","children":$1},{"name":"PRIN","children":$2} ]; }
+|INSTRUCCIONES-CICLOS RETORNO                       { $$=[ {"name":"INST","children":$1},{"name":"RE","children":$2} ]; }
+|INSTRUCCIONES-CICLOS Tk_identificador '+' '+' ';'  { $$=[ {"name":"INST","children":$1},{"name":$2},{"neme":$3},{"name":$4},{"name":$5} ]; }
 ;
 
 
@@ -468,37 +466,38 @@ VARIABLE                                            {}
 
 // estructura de una llamda a metodo
 LLAMADA-METODO:
-Tk_identificador '(' ')' ';'                            {}
-|Tk_identificador '('  PARAMETROSEN-LLAMADA ')' ';'     {}
+Tk_identificador '(' ')' ';'                            { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4}]; }
+|Tk_identificador '('  PARAMETROSEN-LLAMADA ')' ';'     { $$=[{"name":$1},{"name":$2},{"name":"PARAM","children":$3},{"name":$4},{"name":$5}];  }
 ;
 
 
 //*********************  parametros para llamadas a metodos *******************************************
 PARAMETROSEN-LLAMADA:
-EXPRESION                              {}
-|PARAMETROSEN-LLAMADA ',' EXPRESION    {}
+EXPRESION                              {  $$=[{"name":"EXP","children":$1}];  }
+|PARAMETROSEN-LLAMADA ',' EXPRESION    {  $$=[{"name":"PARAM","children":$1},{"name":","},{"name":"EXP","children":$3}];  }
 ;
 
 
 // tipos de retornos que pueden existir dentro de java
 RETORNO:
-Tk_break ';'                {}
-|Tk_continue ';'            {}
-|Tk_return ';'              {}
-|Tk_return EXPRESION ';'    {}
+Tk_break ';'                { $$=[{"name":$1},{"name":$2}]; }
+|Tk_continue ';'            { $$=[{"name":$1},{"name":$2}]; }
+|Tk_return ';'              { $$=[{"name":$1},{"name":$2}]; }
+|Tk_return EXPRESION ';'    { $$=[{"name":$1},{"name":"EXP","children":$2},{"name":$3}]; }
 ;
 
 
 //****************************** impresiones que se pueden realizar dentro java **********************************
 IMPRESION:
-Tk_System '.' Tk_out '.' 'Tk_print' '('   ')'  ';'                      {}
-|Tk_System '.' Tk_out '.' 'Tk_print' '('  EXPRESION  ')'  ';'           {}
+Tk_System '.' Tk_out '.' 'Tk_print' '('   ')'  ';'                      {  $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5},{"name":$6},{"name":$7},{"name":$8}];  }
+|Tk_System '.' Tk_out '.' 'Tk_print' '('  CADENA  ')'  ';'              {  $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5},{"name":$6},{"name":"CAD","children":$7},{"name":$8},{"name":$9}];  }
+|Tk_System '.' Tk_out '.' 'Tk_print' '('  EXPRESION  ')'  ';'           {  $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5},{"name":$6},{"name":"EXP","children":$7},{"name":$8},{"name":$9}];  }
 ;
 
 
 IMPRESION-SALTO:
-Tk_System '.' Tk_out '.' 'Tk_println' '('  ')'  ';'                     {}
-|Tk_System '.' Tk_out '.' 'Tk_println' '('  EXPRESION  ')'  ';'         {}
+Tk_System '.' Tk_out '.' 'Tk_println' '('  ')'  ';'                     {  $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5},{"name":$6},{"name":$7},{"name":$8}];  }
+|Tk_System '.' Tk_out '.' 'Tk_println' '('  EXPRESION  ')'  ';'         {  $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5},{"name":$6},{"name":"EXP","children":$7},{"name":$8},{"name":$9}];  }
 ;
 
 
