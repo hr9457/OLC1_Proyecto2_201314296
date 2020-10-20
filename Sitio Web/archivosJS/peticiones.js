@@ -34,8 +34,10 @@ function setInfo2(editor){
     *verificar que se ha selecinado una tab desde el html para analizar
     */
     if(editor){
-        console.log(editor);
-    
+        console.log("**************************************");
+        console.log("Se encontro una instacia para analizar");
+        texto = editor.getValue();
+        //console.log(texto)
         fetch(url,{
             method: 'POST',
             body: JSON.stringify({"codigo":texto}),

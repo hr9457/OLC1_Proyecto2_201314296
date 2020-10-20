@@ -14,6 +14,7 @@ router.post('/analizar',(req,res) =>{
     var code = req.body;
     data = code.codigo;
     if(data){
+        //obtencion y asignacion de resultados del analisis
         listaAnalisis = translation.parse(data);
         listatokens = listaAnalisis[0];
         traduccion = listaAnalisis[1];
@@ -21,8 +22,8 @@ router.post('/analizar',(req,res) =>{
         /*************************/
          //console.log(grafo);
         console.log(listatokens);
-        console.log(traduccion);
-        console.log(grafo);
+        //console.log(traduccion);
+        //console.log(grafo);
         // respondiendo con la traduccion
         res.json({translation: traduccion});
     }else{
@@ -30,11 +31,6 @@ router.post('/analizar',(req,res) =>{
     }
 })
 
-/*
-router.post('/saludos',(req,res) => {
-    res.json({saludo:'saludos desde nodejs'});
-})
-*/
 
 router.post('/saludos',(req,res) =>{
     var code = req.body;

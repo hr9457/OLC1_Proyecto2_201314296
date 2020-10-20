@@ -63,7 +63,7 @@
                             var reader = new FileReader();
 
                             reader.onload = function(loadedEvent) {
-                                console.log(loadedEvent.target.result);
+                                //console.log(loadedEvent.target.result);
                                 //$('#txt').append(loadedEvent.target.result);
                                 var texto = ""+loadedEvent.target.result;
                                 editor.setValue(texto);
@@ -91,6 +91,7 @@
     <!-- PESTANIAS MULTIPLE  -->
     <div class="container">
         <button onclick="setInfo2(getInstacia())">Analizar</button>
+        <button>List Tokens</button>
         <button>Reporte</button>
         <button>Arbol AST</button>
         <!-- paginas pricipales -->
