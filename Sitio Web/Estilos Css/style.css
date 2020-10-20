@@ -79,7 +79,7 @@ nav ul li ul a:hover{
 }
 
 
-.container{
+div.container{
     float: left;
     height: 500px;
     width: 43%;    

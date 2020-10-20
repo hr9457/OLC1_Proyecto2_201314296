@@ -26,8 +26,8 @@ function loadAsText(theFile,editor) {
     var reader = new FileReader();
 
     reader.onload = function(loadedEvent) {
-        console.log(loadedEvent.target.result);
-        $('#txt').append(loadedEvent.target.result);
+        //console.log(loadedEvent.target.result);
+        //$('#txt').append(loadedEvent.target.result);
         var texto = toString(loadedEvent.target.result);
         editor.setValue("public class Persona{}");
     }

@@ -1,16 +1,21 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-type saludo struct {
-	Saludo string
+//struct from set code
+type Data struct {
+	Codigo string
 }
 
-func main() {
+//peticion para la traduccion del javascript
+func getInfo() {
 	url := "http://localhost:3000/saludos"
 	log.Println(url)
 	resp, err := http.Get(url)
@@ -26,4 +31,38 @@ func main() {
 		//panic(err)
 	}
 	log.Println(string(data))
+}
+
+//funcion para llamar a la petcion post de nodejs
+func setInfo() {
+	url := "http://localhost:3000/saludos"
+	fmt.Println(url)
+	value := Data{"public class animal{int var1=45;}"}
+	datajson, err := json.Marshal(value)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	resp, err := http.Post(url, "application/json; charset=utf-8", bytes.NewBuffer(datajson))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	bodyString := string(bodyBytes)
+	fmt.Println(bodyString)
+}
+
+func convertJSON() {
+	value := Data{
+		Codigo: "public class animal{int var1=45;}",
+	}
+	datosJson, err := json.Marshal(value)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(datosJson))
+}
+
+func main() {
+	setInfo()
 }
