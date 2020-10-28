@@ -12,19 +12,19 @@ interactivo en el cual se desplegaran varias utilidades que podemos aplicar sobr
 
 Para la ediccion principal se mostrar un area de texto en el cual se podra caragar el archivo fuente el cual se desea analizar, esto teniedo en cuenta que podremos tener varias archivos abiertos al mismo tiempo, Aparte de ellos tendremos un apartado con otras dos areas de texto donde se mostarar la traduccion del archivo fuente.
 
-![Principal](Capturas/Principal.png)
+![Principal](https://github.com/hr9457/OLC1_Proyecto2_201314296/blob/master/Capturas/Principal.PNG)
 
 ## Carga de un archvio
 
 en la caraga de un archivo se ha colocado la opcion en el apartado de Menu en el cual podra cargar el archivo fuente que se analizar y colocandolo en el aparto o pestaña que se ha selecionado con anterioridad, en la cual tenra una implementacion para el pintado de palabras utilizando la erramienta [CodeMirror](https://codemirror.net/)
 
-![Carga](Capturas/Carga.png)
+![Carga](https://github.com/hr9457/OLC1_Proyecto2_201314296/blob/master/Capturas/Carga.PNG)
 
 ## Analisis
 
 Para el analisis de los archivos fuentes cargados en la pagina se utilizara las opciones de un pequeño sub-menu colocado arrbia de las pestañas en el cual se debera de selecionar la pestaña que se quiere analizar y luego de dar analizar se cargar las traducciones a JS y Python en el lado derecho.
 
-![Analisis](Capturas/Analisis.png)
+![Analisis](https://github.com/hr9457/OLC1_Proyecto2_201314296/blob/master/Capturas/Analisis.PNG)
 
 
 ## Reportes
@@ -39,7 +39,7 @@ Los reportes que se proporcionar la pagina son:
 
 Para los reportes de los tokes generados y los errores lexico-sintacticos (si existieran) se desplegara una tabla en el cual se mostraran dichos tokens coon una breve descripcion de ellos 
 
-![Reportes](Capturas/Tokens.png)
+![Reportes](..Capturas/Tokens.png)
 
 ### Arbol AST
 
