@@ -8,6 +8,7 @@ El analisis para la traduccion a JavaScript se ha generado utilizando la herrmai
 
 Para la traduccion a python, en el analisis previo de Java se ha ha realizado un traductor hecho sin herramientas para el cual se ha utilizdo el siguiente automata: 
 
+![automata](https://github.com/hr9457/OLC1_Proyecto2_201314296/blob/master/Capturas/automata.PNG)
 
 ## Construccion de API
 
