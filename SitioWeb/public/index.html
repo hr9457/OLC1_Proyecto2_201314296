@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <!--Fuente para utilizar codemirror-->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>    
+    <script src="archivosJS/logicaTabs.js"></script>
+    <link rel="stylesheet" href="Estilos Css/style.css">
+    <link rel="stylesheet" href="Estilos Css/tabsCss.css"> 
+    <!--Fuente para utilizar codemirror-->
+    <script src = "codemirror-5.58.1/lib/codemirror.js"></script> 
+    <link rel="stylesheet" href="codemirror-5.58.1/lib/codemirror.css"> 
+    <script src="codemirror-5.58.1/mode/clike/clike.js" > </script>
+    <script src="codemirror-5.58.1/addon/edit/closetag.js"></script>
+    <link rel="stylesheet" href="codemirror-5.58.1/theme/lucario.css">
+    <title>pagina principal</title>
+</head>
+<body>
+    <!-- Division del menu principal  -->
+    <script>        
+        var instacia;
+        var editor;
+        function obtenerInstacia(editor){
+            this.instacia = editor;
+        }
+        function getInstacia(){
+            return instacia;
+        }
+    </script>
+
+    <nav>
+        <p>Carnet: 201314296</p>
+        <ul>
+            <li>
+                <a> Menu </a>
+                <ul>
+                    <script>
+                        function aperturaArchivo(editor) {
+                            if(this.instacia==null){
+                                alert("no se ha selecionado ninguna ventana");
+                            }
+                            else{
+                                var input = document.createElement('input');
+                                input.type = 'file';
+                                input.id = 'archivo';    
+                                input.accept = '.java'; // extencion a permitir  
+                                input.addEventListener('change',function readFiles(event) {                            
+                                    var fileList = event.target.files;
+                                    
+                                
+                                        for(var i=0; i < fileList.length; i++ ) {
+                                            loadAsText(fileList[i],editor);                                        
+                                        }
+                                    });
+                                input.click();   
+                            }     
+                        }
+
+                        function loadAsText(theFile,editor) {
+                            var reader = new FileReader();
+
+                            reader.onload = function(loadedEvent) {
+                                //console.log(loadedEvent.target.result);
+                                //$('#txt').append(loadedEvent.target.result);
+                                var texto = ""+loadedEvent.target.result;
+                                editor.setValue(texto);
+                            }
+                            reader.readAsText(theFile);
+                        } 
+                    </script>
+                    <a href="#" onclick="aperturaArchivo(instacia)"> Abrir </a>
+                    <a href="#" onclick="aperturaArchivo(instacia)"> Guardar </a>
+                    <a href="#" onclick="aperturaArchivo(instacia)"> Guardar Como </a> 
+                </ul>
+            </li>
+            <li>
+                <a> Descargar </a>
+                <ul>
+                    <a href="#"> Ambos </a>
+                    <a href="#"> JavaScript </a>
+                    <a href="#"> Python </a>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    
+    <!-- PESTANIAS MULTIPLE  -->
+    <div class="container">
+        <!--OPCIONES PARA EL USUARIO SOBRE EL TEXTO-->
+        <button onclick="setInfo2(getInstacia())">Analizar</button>
+        <button onclick="tablaReportes()">List Tokens</button>
+        <button onclick="tablaErrores()">Reporte Errores</button>
+        <button onclick="tree()">Arbol AST</button>
+        <!-- paginas pricipales -->
+        <ul class="tabs">
+            <li class="tab current" data-tab="tab-1" onclick="obtenerInstacia(editor)">Pagina 1</li>
+            <li class="tab" data-tab="tab-2" onclick="obtenerInstacia(editor2)">Pagina 2</li>
+            <li class="tab" data-tab="tab-3" onclick="obtenerInstacia(editor3)">Pagina 3</li>
+            <li class="tab" data-tab="tab-4" onclick="obtenerInstacia(editor4)">Pagina 4</li>
+        </ul>
+
+        <div id="tab-1" class="tab-content current">
+            <h2>Tab One</h2>
+            <textarea id="textoArea1" class="txtArea1"></textarea>
+            <script>
+                editor = CodeMirror.fromTextArea
+                (document.getElementById('textoArea1'),{
+                    line: "integer",
+                    lineNumbers: true,
+                    autoCloseTags: true,
+                    mode: "text/x-java",
+                    theme: "lucario",                     
+                });
+                editor.setSize("98%","95%");
+            </script>   
+            <!-- Your content here -->    
+        </div>
+    
+        <div id="tab-2" class="tab-content">
+            <h2>Tab Two</h2>
+            <textarea id="textoArea2" class="txtArea2"></textarea>
+            <!-- Your content here -->
+            <script>
+                var editor2 = CodeMirror.fromTextArea
+                (document.getElementById('textoArea2'),{
+                    lineNumbers: true,
+                    autoCloseTags: true,
+                    mode: "text/x-java",
+                    theme: "lucario"                    
+                });
+                editor2.setSize("98%","95%");
+            </script>
+        </div>
+    
+        <div id="tab-3" class="tab-content">
+            <h2>Tab Three</h2>
+            <textarea id="textoArea3" class="txtArea3"></textarea>
+            <!-- Your content here -->
+            <script>
+                var editor3 = CodeMirror.fromTextArea
+                (document.getElementById('textoArea3'),{
+                    lineNumbers: true,
+                    autoCloseTags: true,
+                    mode: "text/x-java",
+                    theme: "lucario"                    
+                });
+                editor3.setSize("98%","95%");
+            </script>
+        </div>
+    
+        <div id="tab-4" class="tab-content">
+            <h2>Tab Four</h2>
+            <textarea id="textoArea4" class="txtArea4"></textarea>
+            <script>
+                var editor4 = CodeMirror.fromTextArea
+                (document.getElementById('textoArea4'),{
+                    lineNumbers: true,
+                    autoCloseTags: true,
+                    mode: "text/x-java",
+                    theme: "lucario"                    
+                });
+                editor4.setSize("98%","95%");
+            </script>
+    
+            <!-- Your content here -->
+        </div>
+    
+    </div><!-- container -->
+        
+    <!--ESPACIO PARA CONTNER LOS TEXTO DE AREA PARA LAS TRADUCCIONES-->
+    <div class="traductores">
+        <h2>JavaScript</h2>
+        <div class="js">
+            <textarea id="txt" class="txtJavascript">hola mundo!!</textarea>
+        </div>
+        <h2>Python</h2>
+        <div class="py">
+            <textarea class="txtpython">hola mundo!!</textarea>
+        </div>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>    
+<script src="archivosJS/peticiones.js"></script>
+
+</body>
+</html>

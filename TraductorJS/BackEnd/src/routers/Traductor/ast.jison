@@ -88,10 +88,10 @@
 
 
 //-------------------------------------------- aceptacion de string
-\"[^\"]*\"                      {return 'Tk_cadena';}
+[\"][^\\\"]*([\\][\\\"ntr][^\\\"]*)*[\"]      {return 'Tk_cadena';}
 
 //------------------------------------------- acpetacion de char
-\'.*\'                          {return 'Tk_cadenaChar';}
+[\'][^\\\']*([\\][\\\'ntr][^\\\']*)*[']       {return 'Tk_cadenaChar';}
 
 //------------------------------------------- aceptacion de numeros decimales
 [0-9]+("."[0-9]+)?\b            {return 'Tk_decimal';}
@@ -148,7 +148,7 @@
 //**************************************** DONDE ARRANCA LA GRAMATICA ********************************************
 INICIO: 
 EOF             { return 'Archivo Vacio'; }
-| JAVA  EOF     { return { "name": "INCIO", "children":$1 }; }
+| JAVA  EOF     { return  {"name": "INCIO", "children":$1} ; }
 ;
 
 
@@ -179,7 +179,7 @@ ESTRUCTURA-INTERFACE { $$=$1 }
 ESTRUCTURA-CLASE:
 'Tk_public' 'TK_class' 'Tk_identificador' '{' '}'                           { $$=[{"name":"public"},{"name":"class"},{"name":$3},{"name":"{"},{"name":"}"}]; }
 |'Tk_public' 'TK_class' 'Tk_identificador' '{'  INSTRUCCIONES-CLASE  '}'    { $$=[{"name":"public"},{"name":"class"},{"name":$3},{"name":"{"},{"name":"INSTRU","children":$5},{"name":"}"}]; }
-| ERROR '}'                                                                 { $$=[]; }
+| error '}'                                                                 { $$=[]; }
 ;
 
 
@@ -363,6 +363,7 @@ EXPRESION '&' '&' EXPRESION     { $$=[{"name":"EXP","children":$1},{"name":"&"},
 |EXPRESION '/' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":"/"},{"name":"EXP","children":$3}]; }
 |EXPRESION '+' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":"+"},{"name":"EXP","children":$3}]; }
 |EXPRESION '-' EXPRESION        { $$=[{"name":"EXP","children":$1},{"name":"-"},{"name":"EXP","children":$3}]; }
+|'(' EXPRESION ')'              { $$=[{"name":$1},{"name":"EXP","children":$2},{"name":$3}]; }
 |'!' EXPRESION                  { $$=[{"name":"!"},{"name":"EXP","children":$2}]; }
 |'-' EXPRESION %prec NEGATIVOS  { $$=[{"name":"-"},{"name":"EXP","children":$2}]; }    
 |VALOR                          { $$=[{"name":"VALOR","children":$1}]; }

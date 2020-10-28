@@ -1,13 +1,14 @@
-const { Router } = require('express');
+const { Router, json } = require('express');
 const router = Router();
 const translation = require('./Traductor/analizador');
 const tree = require('./Traductor/ast');
 
 var data = '';
 var traduccion;
-var grafo;
+var grafo = '';
 var listaAnalisis = [];
-var listatokens;
+var listatokens = [];
+var listaErrores = [];
 
 // peticiones
 router.post('/analizar',(req,res) =>{
@@ -16,12 +17,13 @@ router.post('/analizar',(req,res) =>{
     if(data){
         //obtencion y asignacion de resultados del analisis
         listaAnalisis = translation.parse(data);
-        listatokens = listaAnalisis[0];
+        listatokens = listaAnalisis[0];               
         traduccion = listaAnalisis[1];
+        listaErrores = listaAnalisis[2];
         grafo = tree.parse(data);
         /*************************/
-         //console.log(grafo);
-        console.log(listatokens);
+        //console.log(listatokens)
+        //console.log(grafo);        
         //console.log(traduccion);
         //console.log(grafo);
         // respondiendo con la traduccion
@@ -31,7 +33,37 @@ router.post('/analizar',(req,res) =>{
     }
 })
 
+/*
+*peticion para solicitar el listado de tokens obtenidos por el analisis json
+*/
+router.get('/listadoTokens',(req,res) => {
+    //jsonarry = JSON.stringify(listatokens)
+    //console.log(jsonarry)
+    //res.json(jsonarry);
+    //console.log(listatokens);
+    res.send(listatokens);
+})
 
+/*
+*peticion para solicitar el listado de todos los errores encontrados
+*/
+router.get('/listadoErrores',(req,res) =>{
+    res.send(listaErrores);
+})
+
+/*
+*peticion de la data para el grafico del arbol ast
+*/
+router.get('/dataTree',(req,res) =>{
+    //jsonGrafo = JSON.stringify(grafo);
+    //console.log(jsonGrafo)
+    //console.log(grafo);
+    res.send(grafo);
+})
+
+/*
+*peticion para prueba enviando un saludo en formato json como respuesta
+*/
 router.post('/saludos',(req,res) =>{
     var code = req.body;
     data = code.codigo;

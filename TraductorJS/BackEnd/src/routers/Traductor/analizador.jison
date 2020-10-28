@@ -99,22 +99,22 @@
 
 
 //-------------------------------------------- aceptacion de string
-\".*\"                {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"STRING",""+yytext);return 'Tk_cadena';}
+[\"][^\\\"]*([\\][\\\"ntr][^\\\"]*)*[\"]    {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"STRING",""+yytext);return 'Tk_cadena';}
 
 //------------------------------------------- acpetacion de char
-\'.*\'                {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"CARACTER",""+yytext);return 'Tk_cadenaChar';}
+[\'][^\\\']*([\\][\\\'ntr][^\\\']*)*[']     {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"CARACTER",""+yytext);return 'Tk_cadenaChar';}
 
 //------------------------------------------- aceptacion de numeros decimales
-[0-9]+(.[0-9])+\b     {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"DECIMAL",""+yytext);return 'Tk_decimal';}
+[0-9]+("."[0-9]+)?\b                        {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"DECIMAL",""+yytext);return 'Tk_decimal';}
 
 //------------------------------------------- aceptacion de digitos de 0 a 9
-[0-9]+\b              {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"DIGITO",""+yytext);return 'Tk_digito';}
+[0-9]+\b                                    {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"DIGITO",""+yytext);return 'Tk_digito';}
 
 //  secuencia para aceptar un identificador letras,numero y _ inicio o en medio
-[a-zA-Z_][a-zA-Z0-9_]*  {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"IDENTIFICADOR",""+yytext);return 'Tk_identificador';}
+[a-zA-Z_][a-zA-Z0-9_]*                      {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"IDENTIFICADOR",""+yytext);return 'Tk_identificador';}
 
 // captura para erroles lexico , cualquier caracter, excepto los que ya definimos
-.   {addErrorLexico("Lexico",yylloc.first_line,yylloc.first_column,"El caracter "+yytext+" no pertenece al lenguaje");}
+.                                           {addErrorLexico("Lexico",yylloc.first_line,yylloc.first_column,"El caracter "+yytext+" no pertenece al lenguaje");}
 
 
 
@@ -155,7 +155,7 @@
 //**************************************** DONDE ARRANCA LA GRAMATICA ********************************************
 INICIO: 
 EOF             {return 'Archivo Vacio';}
-| JAVA  EOF     {return [listaReporteToken,$1];}
+| JAVA  EOF     {return [listaReporteToken,$1,listaErroresLexicos];}
 ;
 //console.log(JSON.stringify(listaReporteToken));
 
@@ -203,6 +203,7 @@ ESTRUCTURA-INTERFACE:
 METODO-MAIN:
 'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' '}'                          { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12}`; }
 |'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' INSTRUCCIONES-MAIN '}'      { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12} ${$13}`; }
+|error '}'
 ;
 
 
@@ -370,6 +371,7 @@ EXPRESION '&' '&' EXPRESION     {$$=`${$1} and ${$4}`;}
 |EXPRESION '/' EXPRESION        {$$=`${$1}/${$3}`;}
 |EXPRESION '+' EXPRESION        {$$=`${$1}+${$3}`;}
 |EXPRESION '-' EXPRESION        {$$=`${$1}-${$3}`;}
+|'(' EXPRESION ')'              {$$=`${$1}${$2}${$3}`;}
 |'!' EXPRESION                  {$$=`not ${$2}`;}
 |'-' EXPRESION %prec NEGATIVOS  {$$=`-${$2}`;}    
 |VALOR                          {$$=`${$1}`;}
