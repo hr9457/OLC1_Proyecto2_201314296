@@ -39,10 +39,10 @@ Los reportes que se proporcionar la pagina son:
 
 Para los reportes de los tokes generados y los errores lexico-sintacticos (si existieran) se desplegara una tabla en el cual se mostraran dichos tokens coon una breve descripcion de ellos 
 
-![Reportes](..Capturas/Tokens.png)
+![Reportes](https://github.com/hr9457/OLC1_Proyecto2_201314296/blob/master/Capturas/Tokens.PNG)
 
 ### Arbol AST
 
 Para la presentacion del arbol **AST** de igual maneera se mostar en una ventaa diferente para la cual se ha utilizado la herramienta [D3](https://github.com/magjac/d3-graphviz) de [Graphviz](https://www.graphviz.org/resources/) la cual proporcinara al usuario una mejor navegacion entre los nodos que se pudieran produccir del archivo fuente analizado
 
-![Arbol](Capturas/ast.png)
+![Arbol](https://github.com/hr9457/OLC1_Proyecto2_201314296/blob/master/Capturas/ast.PNG)
