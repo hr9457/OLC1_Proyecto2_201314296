@@ -1,5 +1,27 @@
 # Manual Tecnico
 
+## Traduccion de JS
+
+El analisis para la traduccion a JavaScript se ha generado utilizando la herrmaienta de [Jison](https://zaa.ch/jison/) de la cual fue sacada la traduccion, analisis lexico,sintactico,y reporte de tokens encontrados
+
+## Traduccion de Pyhton
+
+Para la traduccion a python, en el analisis previo de Java se ha ha realizado un traductor hecho sin herramientas para el cual se ha utilizdo el siguiente automata: 
+
+
+## Construccion de API
+
+para la construccion de las apis para traductor en donde se la pagina principal hara las consultad se ha uitilizado [Node Js](https://nodejs.org/en/) para la cual se ha requerido los modulos de: 
+* Express
+* Cors
+* Morgan
+
+## Pagina Web 
+
+En la pagina web ha sido construida con las herramientas de html,css y js
+
+para la creacion de la los servicios y consumo de las api's de la pagina principal se utilizo el lenguaje de programacion **GO** 
+
 # Manual Usuario
 
 La aplicacion es una herramienta en la cual proporcionara al usuario la posibilidad de hacer la traduccion de un archivo escrito en Java a Javascript y Python con la posibilidad de ver un listado los tokens, errores lexicos, errores sintacticos y la grafica de un arbol ast
