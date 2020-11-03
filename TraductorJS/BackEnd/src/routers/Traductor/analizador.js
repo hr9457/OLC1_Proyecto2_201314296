@@ -92,7 +92,7 @@ break;
 case 3: case 7: case 29: case 31: case 32: case 33: case 34: case 35: case 41: case 42: case 44: case 45: case 46: case 47: case 48: case 49: case 50: case 66: case 67: case 68: case 69: case 70: case 71: case 72: case 73: case 74: case 75: case 99: case 126: case 138: case 143: case 144: case 145: case 146: case 147: case 148: case 149: case 150: case 151: case 152: case 165:
  this.$=`${$$[$0]}`; 
 break;
-case 4: case 90:
+case 4:
  this.$=``; 
 break;
 case 5: case 36: case 37: case 38: case 39: case 40: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 58: case 59: case 60: case 77: case 78: case 79: case 80: case 81: case 82: case 83: case 84: case 85: case 86: case 127: case 154: case 155: case 156: case 157: case 158: case 159: case 160: case 161:
@@ -106,6 +106,9 @@ case 9:
 break;
 case 10:
  this.$ = `${$$[$0-5]} ${$$[$0-4]} ${$$[$0-3]} ${$$[$0-2]} \n${$$[$0-1]} \n${$$[$0]}`; 
+break;
+case 11: case 16:
+ addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }");
 break;
 case 14:
  this.$=`function main ${$$[$0-7]} ${$$[$0-3]} ${$$[$0-2]} ${$$[$0-1]} \n${$$[$0]}`; 
@@ -131,6 +134,9 @@ break;
 case 43:
              
 break;
+case 65:
+ addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con ;");
+break;
 case 76: case 153: case 163:
  this.$=`${$$[$0-3]}${$$[$0-2]}${$$[$0-1]}${$$[$0]}`; 
 break;
@@ -142,6 +148,9 @@ case 88:
 break;
 case 89:
  this.$=`${$$[$0-2]} ${$$[$0-1]} ${$$[$0]}`; 
+break;
+case 90:
+ addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con ;"); this.$=``; 
 break;
 case 91: case 92: case 93: case 94: case 95:
  this.$="var"; 

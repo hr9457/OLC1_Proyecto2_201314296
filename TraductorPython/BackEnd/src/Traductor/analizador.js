@@ -82,6 +82,7 @@ function isSymbol(caracter){
         ||caracter==93//]
         ||caracter==94//^
         ||caracter==123//{
+        ||caracter==124//|
         ||caracter==125//}
         ){
         return true;
@@ -150,8 +151,8 @@ function analizador(cadena){
                 }
                 else{
                     if(palabrasReservadas.includes(token)){
-                        addToken(fila,columna,'Reservada',token);
-                        addToken2(token,caracter);
+                        addToken(fila,columna,'reservada',token);
+                        addToken2(token,token);
                     }else{
                         addToken(fila,columna,'ID',token);
                         addToken2('id',token);
@@ -246,7 +247,7 @@ function analizador(cadena){
                 break;
             //
             case 7:
-                addToken(fila,columna,'String',token);
+                addToken(fila,columna,'stringCadena',token);
                 addToken2('string',token);
                 this.token='';
                 this.columna++;
@@ -295,7 +296,7 @@ function analizador(cadena){
             //
             case 10:
                 addToken(fila,columna,'Char',token);
-                addToken2('char',token);
+                addToken2('charCadena',token);
                 this.token='';
                 this.columna++;
                 this.estado=0;
@@ -383,41 +384,22 @@ function analizador(cadena){
     */
     tokenPreanalisis = listaTokens2[0].Tipo;
     valorPreanalisis = listaTokens2[0].Token;
-    console.log(tokenPreanalisis);
+    //console.log(tokenPreanalisis);
     analisisSintactico();// 
     console.log(listaTokens);  
     this.puntero=0;
 }
 
-
+/*****************************************************************************************/
 /**
- * metodo de parea
- */
-function matchToken(token)
-{
-    if(token != tokenPreanalisis)
-    {
-        console.log("Se esperaba: "+token);
-        error();//(estado1)
-    }
-    else
-    {
-        console.log("match con: "+tokenPreanalisis);
-        if(posicionLista<listaTokens2.length)
-        {    
-            posicionLista++;
-            tokenPreanalisis = listaTokens2[posicionLista].Tipo;
-        }
-    }    
-}
-
-/**
- * segundo metodo match
+ *************************************************************segundo metodo match
  */
 function match(token)
 {
     if(token!=tokenPreanalisis)
-    {return false;}
+    {
+        return false;
+    }
     else
     {
         token = tokenPreanalisis;
@@ -431,7 +413,7 @@ function match(token)
 
 
 /**
- * estado de error
+ ****************************************************estado de error
  */
 function error()
 {
@@ -440,12 +422,13 @@ function error()
     {
         posicionLista++;
         tokenPreanalisis = listaTokens2[posicionLista].Tipo;
+        valorPreanalisis = listaTokens2[posicionLista].Token;
     }
 }
 
 
 /*
-*analisis sintactico
+*********************************************** analisis sintactico
 */
 function analisisSintactico()
 {
@@ -453,13 +436,16 @@ function analisisSintactico()
     java2();
 }
 
+/**
+ ******************************************* revision si existen tokens para analizar
+ */
 function java2()
 {
     switch(listaTokens2[posicionLista].Tipo)
     {
         case 'public':
             match('public');
-            clase_interface2();
+            clase_interface();
             break;
         default:
             return false;
@@ -467,8 +453,10 @@ function java2()
     java2();
 }
 
-//distinguir etre una clase y una interface
-function clase_interface2()
+/**
+ ***************************************** Decision entre clase o interface 
+ */
+function clase_interface()
 {
     switch(listaTokens2[posicionLista].Tipo)
     {
@@ -477,8 +465,14 @@ function clase_interface2()
             var id = valorPreanalisis;
             if(match('id')==false){break;}
             if(match('{')==false){break;}
+
+            var fo = funcionFor();
+
             if(match('}')==false){break;}
             console.log("class "+id+":");
+
+            console.log(fo);
+
             break;
         case 'interface':
             if(match('interface')==false){break;}
@@ -491,5 +485,447 @@ function clase_interface2()
     }
 }
 
-function instruccionesClase(){}
-function instruccionesInterface(){}
+/**
+ * metodo main aceptado en java
+ */
+function metodoMain()
+{
+    match('public');
+    match('static');
+    match('void');
+    match('main');
+    match('(');
+    match('String');
+    match('[');
+    match(']');
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    match(')');
+    match('{');
+    match('}');
+    return '\tdef main():';
+}
+
+/**
+ * estructruas de las funciones permitidas en java
+ */
+function funcionesJava()
+{
+    match('public');
+    tipoRetorno();
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    match('(');
+    /**
+     * revision de entrada de parametros
+     */
+    if(listaTokens2[posicionLista].Token==')')
+    {
+        match(')');
+        match('{');
+        match('}');
+        return '\tself '+identificador+'( ):';
+    }
+    else
+    {
+        var parametros = parametroJava();
+        match(')');
+        match('{');
+        match('}');
+        return '\tself '+identificador+'( '+parametros+' ):';
+    }    
+}
+
+/**
+ * estructrua de los metodos permitidos en java
+ */
+function metodosJava()
+{
+    match('public');
+    tipoRetorno();
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    match('(');
+    /**
+     * revision de entrada de parametros
+     */
+    if(listaTokens2[posicionLista].Token==')')
+    {
+        match(')');
+        match(';');
+        return '\tself '+identificador+'( )';
+    }
+    else
+    {
+        var parametros = parametroJava();
+        match(')');
+        match(';');
+        return '\tself '+identificador+'( '+parametros+' )';
+    }
+}
+
+function parametroJava()
+{
+    var tipo = tipoVariable();
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    if(listaTokens2[posicionLista].Token==',')
+    {
+        match(',');
+        var parametro = parametroJava();
+        return identificador+','+parametro;
+    }
+    return ''+identificador;
+}
+
+/**
+ * asignaciones a variables permitidas dentro de java
+ */
+function asignacionA()
+{
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    match('=');
+    var exp = expresion();
+    match(';');
+    return '\t'+identificador+'='+exp;
+}
+
+/**
+ * Estructura de variables aceptadas
+ */
+function variables()
+{
+    var tipo = tipoVariable();
+    if(tipo==false)
+    {
+        return false;
+    }
+    else
+    {
+        var declaRacion = declaracion();
+        match(';');
+        return '\t'+tipo+' '+declaRacion;
+    }
+}
+
+/**
+ **  declaracion  que pueden llevar una variable
+ */
+function declaracion()
+{
+    var asigNacion = asignacion();
+    if(listaTokens2[posicionLista].Tipo==',')
+    {
+        match(',');
+        var asignacionMulti = declaracion();
+        return asigNacion +','+asignacionMulti;
+    }
+    return ''+asigNacion;
+}
+
+
+/**
+ **  asignaciones a una variable
+ */
+function asignacion()
+{
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    if(listaTokens2[posicionLista].Tipo=='=')
+    {
+        match('=');
+        var exp = expresion();
+        return ''+identificador+'='+exp;
+    }
+    return ''+identificador;
+}
+
+/**
+ * funcion while aceptada en java
+ */
+function funcionWhile()
+{
+    match('while');
+    match('(');
+    var exp = expresion();
+    match(')');
+    match('{');
+    match('}');
+    return '\twhile '+exp+':';
+}
+
+/**
+ * funcion do while aceptada en java
+ */
+function funcionDoWhile()
+{
+    match('do');
+    match('{');
+    match('}')
+    match('while');
+    match('(');
+    var exp = expresion();
+    match(')');
+    match(';');
+    return '\twhile '+exp+':';
+}
+
+/**
+ * estructura de un funcion for aceptada en java
+ */
+function funcionFor()
+{
+    match('for');
+    match('(');
+    var declaracion = dec();
+    match(';');
+    var exp = expresion();
+    match(';');
+    var exp2 = expresion();
+    match(')');
+    match('{');
+    match('}');
+    return '\tfor '+declaracion+' in range ('+exp+','+exp2+'):';
+}
+
+/**
+ * sintaxis de una declaracion para el ciclo for
+ */
+function dec()
+{
+    if(listaTokens2[posicionLista].Tipo=='id')
+    {
+        var identificador = listaTokens2[posicionLista].Token;
+        match('id');
+        if(listaTokens2[posicionLista].Tipo=='=')
+        {
+            match('=');
+            var vaLor = valor();
+            return ''+identificador+'='+vaLor;
+        }    
+        return ''+identificador; 
+    }     
+    else 
+    {
+        var tipo = tipoVariable();
+        var identificador = listaTokens2[posicionLista].Token;
+        match('id');
+        match('=');
+        var vaLor = valor();
+        return ''+identificador+'='+vaLor;
+    }
+}
+
+/**
+ ** tipos de expresiones aceptadas en java
+ */
+function expresion()
+{
+    if(listaTokens2[posicionLista].Tipo=='!')
+    {
+        match('!');
+        var exp = expresion()
+        return 'not '+exp;        
+    }
+    else if(listaTokens2[posicionLista].Tipo=='(')
+    {
+        match('(');
+        var exp = expresion();
+        match(')');
+        return '('+exp+')';
+    }
+    else if(listaTokens2[posicionLista].Tipo=='-')
+    {
+        match('-');
+        var exp = expresion();
+        return '-'+exp;
+    }
+    else
+    {
+        var vaLor = valor();
+        if(listaTokens2[posicionLista].Tipo=='&')
+        {
+            match('&');
+            match('&');
+            var exp = expresion();
+            return ''+vaLor+' and '+exp;
+        }
+        else if(listaTokens2[posicionLista].Tipo=='|')
+        {
+            match('|');
+            match('|');
+            var exp = expresion();
+            return ''+vaLor+' or '+exp;
+        }
+        else if(listaTokens2[posicionLista].Tipo=='^')
+        {
+            match('^');
+            var exp = expresion();
+            return ''+vaLor+' xor '+exp;
+        }
+        else if(listaTokens2[posicionLista].Tipo=='>')
+        {
+            match('>');
+            if(listaTokens2[posicionLista].Tipo=='=')
+            {
+                match('=');
+                var exp = expresion();
+                return ''+vaLor+' >= '+exp;
+            }
+            else
+            {
+                var exp = expresion();
+                return ''+vaLor+' > '+exp;
+            }
+        }
+        else if(listaTokens2[posicionLista].Tipo=='<')
+        {
+            match('<');
+            if(listaTokens2[posicionLista].Tipo=='=')
+            {
+                match('=');
+                var exp = expresion();
+                return ''+vaLor+' <= '+exp;
+            }
+            else
+            {
+                var exp = expresion();
+                return ''+vaLor+' < '+exp;
+            }            
+        }
+        else if(listaTokens2[posicionLista].Tipo=='=')
+        {
+            match('=');
+            match('=');
+            var exp = expresion();
+            return ''+vaLor+' == '+exp;
+        }
+        else if(listaTokens2[posicionLista].Tipo=='!')
+        {
+            match('!');
+            match('=');
+            var exp = expresion();
+            return ''+vaLor+' != '+exp;
+        }
+        else if(listaTokens2[posicionLista].Tipo=='+')
+        {
+            match('+');
+            var exp = expresion();
+            return ''+vaLor+'+'+exp;
+        }
+        else if(listaTokens2[posicionLista].Tipo=='-')
+        {
+            match('-');
+            var exp = expresion();
+            return ''+vaLor+'-'+exp;
+        }
+        else if(listaTokens2[posicionLista].Tipo=='*')
+        {
+            match('*');
+            var exp = expresion();
+            return ''+vaLor+'*'+exp;
+        }
+        else if(listaTokens2[posicionLista].Tipo=='/')
+        {
+            match('/');
+            var exp = expresion();
+            return ''+vaLor+'/'+exp;
+        }
+        return ''+vaLor; 
+    }
+}
+
+/**
+ ************************************************** tipos de variables aceptadas
+ */
+function tipoVariable()
+{
+    switch(listaTokens2[posicionLista].Tipo)
+    {
+        case 'int':
+            match('int');
+            return 'var';
+        case 'boolean': 
+            match('boolean');
+            return 'var';
+        case 'double':
+            match('double');
+            return 'var';
+        case 'String':
+            match('String');
+            return 'var';
+        case 'char':
+            match('char');
+            return 'var';
+        default:
+            return false;
+    }
+}
+
+/**
+ ** valores aceptados en java
+ */
+function valor()
+{
+    switch(listaTokens2[posicionLista].Tipo)
+    {
+        case 'digito':
+            var vaLor = listaTokens2[posicionLista].Token;
+            match('digito');
+            return ''+vaLor;
+        case 'decimal':
+            var vaLor = listaTokens2[posicionLista].Token; 
+            match('decimal');
+            return ''+vaLor;
+        case 'stringCadena': 
+            var vaLor = listaTokens2[posicionLista].Token;
+            match('stringCadena');
+            return ''+vaLor;
+        case 'charCadena':
+            var vaLor = listaTokens2[posicionLista].Token;
+            match('charCadena');
+            return ''+vaLor;
+        case 'true':
+            var vaLor = listaTokens2[posicionLista].Token;
+            match('true');
+            return ''+vaLor;
+        case 'false':
+            var vaLor = listaTokens2[posicionLista].Token;
+            match('false');
+            return ''+vaLor;
+        case 'id':
+            var vaLor = listaTokens2[posicionLista].Token;
+            match('id');
+            return ''+vaLor;
+        default:
+            return false;
+    }
+}
+
+/**
+ * tipos de retornos aceptados en funciones y metodos
+ */
+function tipoRetorno()
+{
+    switch(listaTokens2[posicionLista].Tipo)
+    {
+        case 'void':
+            match('void');
+            break;
+        case 'int':
+            match('int');
+            break;
+        case 'boolean':
+            match('boolean');
+            break;
+        case 'String':
+            match('String');
+            break;
+        case 'char':
+            match('char');
+            break;
+        default:
+            return false;
+    }
+}

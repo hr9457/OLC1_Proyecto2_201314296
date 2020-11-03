@@ -1,36 +1,121 @@
 /**
- * instacia
+ * funcion para descar la traduccion del archivo javascript
  */
-var instacia;
-
-/**
- * funcion para cara un archivo de entrda
- */
-function aperturaArchivo(editor) {
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.id = 'archivo';    
-    input.accept = '.java'; // extencion a permitir  
-    input.addEventListener('change',function readFiles(event) {                            
-        var fileList = event.target.files;
-        
+function dowloadJS()
+{
+    var hoy = new Date();
+    var fecha = hoy.getDate() + '-' + ( hoy.getMonth() + 1 ) + '-' + hoy.getFullYear();
+    var hora = hoy.getHours() + '-' + hoy.getMinutes() + '-' + hoy.getSeconds();
+    var fechaYHora = fecha + '_' + hora;    
+    var data = document.getElementById('txt').value;
+    //console.log(data);
     
-            for(var i=0; i < fileList.length; i++ ) {
-                loadAsText(fileList[i],editor);                                        
-            }
-        });
-    input.click();    
+    var nombre="ArchivoJS-"+fechaYHora+".java";//nombre del archivo
+    var file=new Blob([data], {type: 'text/plain'});//archivo
+    //descargar
+    if(window.navigator.msSaveOrOpenBlob){
+        window.navigator.msSaveOrOpenBlob(file, nombre);
+    }else{
+        var a=document.createElement("a"),url=URL.createObjectURL(file);
+        a.href=url;
+        a.download=nombre;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        },0);}
 }
 
-function loadAsText(theFile,editor) {
-    var reader = new FileReader();
+/**
+ * funcion para descargar la traduccion de python
+ */
+function dowloadPY()
+{
+    var hoy = new Date();
+    var fecha = hoy.getDate() + '-' + ( hoy.getMonth() + 1 ) + '-' + hoy.getFullYear();
+    var hora = hoy.getHours() + '-' + hoy.getMinutes() + '-' + hoy.getSeconds();
+    var fechaYHora = fecha + '_' + hora;
+    var data = document.getElementById('txtpython').value;
+    //
+    var nombre="ArchivoPY-"+fechaYHora+".py";//nombre del archivo
+    var file=new Blob([data], {type: 'text/plain'});//archivo
+    //descargar
+    if(window.navigator.msSaveOrOpenBlob){
+        window.navigator.msSaveOrOpenBlob(file, nombre);
+    }else{
+        var a=document.createElement("a"),url=URL.createObjectURL(file);
+        a.href=url;
+        a.download=nombre;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        },0);}
+}
 
-    reader.onload = function(loadedEvent) {
-        //console.log(loadedEvent.target.result);
-        //$('#txt').append(loadedEvent.target.result);
-        var texto = toString(loadedEvent.target.result);
-        editor.setValue("public class Persona{}");
-    }
-    reader.readAsText(theFile);
-} 
+/**
+ * funcion para descargar ambas traducciones
+ */
+function dowloadAmbos()
+{
+    dowloadJS();
+    dowloadPY();
+}
 
+/*
+*funcion para descargar y guardar como
+*/
+function saveAs(instacia)
+{
+    if(instacia==null){return alert("no se ha selecionado ninguna ventana");}
+    else{
+        var data = instacia.getValue();
+        //
+        var nombre=".java";//nombre del archivo
+        var file=new Blob([data], {type: 'text/plain'});//archivo
+        //descargar
+        if(window.navigator.msSaveOrOpenBlob){
+            window.navigator.msSaveOrOpenBlob(file, nombre);
+        }else{
+            var a=document.createElement("a"),url=URL.createObjectURL(file);
+            a.href=url;
+            a.download=nombre;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function(){
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);  
+            },0);}
+        }
+}
+/**
+ * 
+ * metodo para guardar 
+ */
+function save(instacia,namePestania)
+{
+    if(instacia==null){return alert("no se ha selecionado ninguna ventana");}
+    else{
+        var pestania = document.getElementById(namePestania).innerText;
+        //console.log(pestania);
+        var data = instacia.getValue();
+        //
+        var nombre=pestania;//nombre del archivo
+        var file=new Blob([data], {type: 'text/plain'});//archivo
+        //descargar
+        if(window.navigator.msSaveOrOpenBlob){
+            window.navigator.msSaveOrOpenBlob(file, nombre);
+        }else{
+            var a=document.createElement("a"),url=URL.createObjectURL(file);
+            a.href=url;
+            a.download=nombre;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function(){
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);  
+            },0);}
+        }
+}

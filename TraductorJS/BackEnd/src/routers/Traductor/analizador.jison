@@ -187,7 +187,7 @@ ESTRUCTURA-INTERFACE    {}
 ESTRUCTURA-CLASE:
 'Tk_public' 'TK_class' 'Tk_identificador' '{' '}'                           { $$ = `${$1} ${$2} ${$3} ${$4} \n${$5}`; }
 |'Tk_public' 'TK_class' 'Tk_identificador' '{'  INSTRUCCIONES-CLASE  '}'    { $$ = `${$1} ${$2} ${$3} ${$4} \n${$5} \n${$6}`; }
-| error '}'                                                                 {}
+| error '}'                                                                 { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }");}
 ;
 
 
@@ -203,7 +203,7 @@ ESTRUCTURA-INTERFACE:
 METODO-MAIN:
 'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' '}'                          { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12}`; }
 |'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' INSTRUCCIONES-MAIN '}'      { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12} ${$13}`; }
-|error '}'
+|error '}'                                                                                                                  { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }");}
 ;
 
 
@@ -286,7 +286,7 @@ INSTRUCCIONES-INTERFACE:
 |'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'                             {}
 |INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                {}
 |INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'     {}
-| error ';'                                                                                     {}
+| error ';'                                                                                     { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con ;");}
 ;
 
 
@@ -327,7 +327,7 @@ Tk_identificador '=' EXPRESION ';' { $$=`${$1} ${$2} ${$3}${$4}`; }
 //********************** ESTRUCTURA DE UNA VARIABLE ******************************
 VARIABLE:
 TIPO-VARIABLE DECLARACION ';' { $$=`${$1} ${$2} ${$3}`; }
-| error ';'                   { $$=``; }
+| error ';'                   { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con ;"); $$=``; }
 ;
 
 

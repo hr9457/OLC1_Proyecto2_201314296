@@ -228,10 +228,10 @@ case 62:
  this.$=[{"name":$$[$0-6]},{"name":$$[$0-5]},{"name":$$[$0-4]},{"name":$$[$0-3]},{"name":"PARA","children":$$[$0-2]},{"name":$$[$0-1]},{"name":$$[$0-1]}]; 
 break;
 case 63:
- this.$=[{"name":"INTER","children":$$[$0-6]},{"name":$$[$0-5]},{"name":"TIPO","children":$$[$0-4]},{"name":$$[$0-3]},{"name":$$[$0-2]},{"name":$$[$0-1]},{"name":$$[$0]}]; 
+ this.$=[{"name":"INSTRU","children":$$[$0-6]},{"name":$$[$0-5]},{"name":"TIPO","children":$$[$0-4]},{"name":$$[$0-3]},{"name":$$[$0-2]},{"name":$$[$0-1]},{"name":$$[$0]}]; 
 break;
 case 64:
- this.$=[{"name":"INTER","children":$$[$0-7]},{"name":$$[$0-6]},{"name":"TIPO","children":$$[$0-5]},{"name":$$[$0-4]},{"name":$$[$0-3]},{"name":"PARA","children":$$[$0-2]},{"name":$$[$0-1]},{"name":$$[$0]}]; 
+ this.$=[{"name":"INSTRU","children":$$[$0-7]},{"name":$$[$0-6]},{"name":"TIPO","children":$$[$0-5]},{"name":$$[$0-4]},{"name":$$[$0-3]},{"name":"PARA","children":$$[$0-2]},{"name":$$[$0-1]},{"name":$$[$0]}]; 
 break;
 case 65:
  this.$=[{}];  

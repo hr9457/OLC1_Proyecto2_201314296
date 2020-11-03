@@ -276,8 +276,8 @@ VARIABLE                                { $$=[{"name":"VAR","children":$1} ];  }
 INSTRUCCIONES-INTERFACE:
 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                                         { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5},{"name":$6}]; }
 |'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'                             { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4},{"name":"PARA","children":$5},{"name":$6},{"name":$6}]; }
-|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                { $$=[{"name":"INTER","children":$1},{"name":$2},{"name":"TIPO","children":$3},{"name":$4},{"name":$5},{"name":$6},{"name":$7}]; }
-|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'     { $$=[{"name":"INTER","children":$1},{"name":$2},{"name":"TIPO","children":$3},{"name":$4},{"name":$5},{"name":"PARA","children":$6},{"name":$7},{"name":$8}]; }
+|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' ')' ';'                { $$=[{"name":"INSTRU","children":$1},{"name":$2},{"name":"TIPO","children":$3},{"name":$4},{"name":$5},{"name":$6},{"name":$7}]; }
+|INSTRUCCIONES-INTERFACE 'Tk_public' TIPO-RETORNO 'Tk_identificador' '(' PARAMETROS ')' ';'     { $$=[{"name":"INSTRU","children":$1},{"name":$2},{"name":"TIPO","children":$3},{"name":$4},{"name":$5},{"name":"PARA","children":$6},{"name":$7},{"name":$8}]; }
 |error ';'                                                                                      { $$=[{}];  }
 ;
 

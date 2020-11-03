@@ -23,12 +23,15 @@
     <script>        
         var instacia;
         var editor;
-        function obtenerInstacia(editor){
+        var nameEditor;
+        function obtenerInstacia(editor,name){
             this.instacia = editor;
+            this.nameEditor = name;
         }
         function getInstacia(){
             return instacia;
         }
+        function getName(){return nameEditor;}
     </script>
 
     <nav>
@@ -38,7 +41,7 @@
                 <a> Menu </a>
                 <ul>
                     <script>
-                        function aperturaArchivo(editor) {
+                        function aperturaArchivo(editor,name) {
                             if(this.instacia==null){
                                 alert("no se ha selecionado ninguna ventana");
                             }
@@ -52,16 +55,18 @@
                                     
                                 
                                         for(var i=0; i < fileList.length; i++ ) {
-                                            loadAsText(fileList[i],editor);                                        
+                                            loadAsText(fileList[i],editor,name);                                        
                                         }
                                     });
                                 input.click();   
                             }     
                         }
 
-                        function loadAsText(theFile,editor) {
+                        function loadAsText(theFile,editor,name) {
                             var reader = new FileReader();
-
+                            var nombreCarga = theFile.name;//nombre del archivo
+                            pagina = document.getElementById(''+name);
+                            pagina.innerHTML = ""+nombreCarga;//asignacion para la pestania
                             reader.onload = function(loadedEvent) {
                                 //console.log(loadedEvent.target.result);
                                 //$('#txt').append(loadedEvent.target.result);
@@ -71,17 +76,17 @@
                             reader.readAsText(theFile);
                         } 
                     </script>
-                    <a href="#" onclick="aperturaArchivo(instacia)"> Abrir </a>
-                    <a href="#" onclick="aperturaArchivo(instacia)"> Guardar </a>
-                    <a href="#" onclick="aperturaArchivo(instacia)"> Guardar Como </a> 
+                    <a href="#" onclick="aperturaArchivo(getInstacia(),getName())"> Abrir </a>
+                    <a href="#" onclick="save(getInstacia(),getName())"> Guardar </a>
+                    <a href="#" onclick="saveAs(getInstacia())"> Guardar Como </a> 
                 </ul>
             </li>
             <li>
                 <a> Descargar </a>
                 <ul>
-                    <a href="#"> Ambos </a>
-                    <a href="#"> JavaScript </a>
-                    <a href="#"> Python </a>
+                    <a href="#" onclick="dowloadAmbos()"> Ambos </a>
+                    <a href="#" onclick="dowloadJS()"> JavaScript </a>
+                    <a href="#" onclick="dowloadPY()"> Python </a>
                 </ul>
             </li>
         </ul>
@@ -92,19 +97,21 @@
     <div class="container">
         <!--OPCIONES PARA EL USUARIO SOBRE EL TEXTO-->
         <button onclick="setInfo2(getInstacia())">Analizar</button>
-        <button onclick="tablaReportes()">List Tokens</button>
-        <button onclick="tablaErrores()">Reporte Errores</button>
-        <button onclick="tree()">Arbol AST</button>
+        <button onclick="tablaReportes()">Tokens J</button>
+        <button onclick="tablaErrores()">Errores J</button>
+        <button onclick="tree()">AST J</button>
+        <button onclick="tree()">Tokens P</button>
+        <button onclick="tree()">Errores P</button>
         <!-- paginas pricipales -->
         <ul class="tabs">
-            <li class="tab current" data-tab="tab-1" onclick="obtenerInstacia(editor)">Pagina 1</li>
-            <li class="tab" data-tab="tab-2" onclick="obtenerInstacia(editor2)">Pagina 2</li>
-            <li class="tab" data-tab="tab-3" onclick="obtenerInstacia(editor3)">Pagina 3</li>
-            <li class="tab" data-tab="tab-4" onclick="obtenerInstacia(editor4)">Pagina 4</li>
+            <li id="p1" class="tab current" data-tab="tab-1" onclick="obtenerInstacia(editor,'p1')">Pagina 1</li>
+            <li id="p2" class="tab" data-tab="tab-2" onclick="obtenerInstacia(editor2,'p2')">Pagina 2</li>
+            <li id="p3" class="tab" data-tab="tab-3" onclick="obtenerInstacia(editor3,'p3')">Pagina 3</li>
+            <li id="p4" class="tab" data-tab="tab-4" onclick="obtenerInstacia(editor4,'p4')">Pagina 4</li>
         </ul>
 
         <div id="tab-1" class="tab-content current">
-            <h2>Tab One</h2>
+            <h2 id="tabla1">Tab One</h2>
             <textarea id="textoArea1" class="txtArea1"></textarea>
             <script>
                 editor = CodeMirror.fromTextArea
@@ -121,7 +128,7 @@
         </div>
     
         <div id="tab-2" class="tab-content">
-            <h2>Tab Two</h2>
+            <h2 id="tabla2">Tab Two</h2>
             <textarea id="textoArea2" class="txtArea2"></textarea>
             <!-- Your content here -->
             <script>
@@ -137,7 +144,7 @@
         </div>
     
         <div id="tab-3" class="tab-content">
-            <h2>Tab Three</h2>
+            <h2 id="tabla3">Tab Three</h2>
             <textarea id="textoArea3" class="txtArea3"></textarea>
             <!-- Your content here -->
             <script>
@@ -153,7 +160,7 @@
         </div>
     
         <div id="tab-4" class="tab-content">
-            <h2>Tab Four</h2>
+            <h2 id="tabla4">Tab Four</h2>
             <textarea id="textoArea4" class="txtArea4"></textarea>
             <script>
                 var editor4 = CodeMirror.fromTextArea
@@ -175,16 +182,17 @@
     <div class="traductores">
         <h2>JavaScript</h2>
         <div class="js">
-            <textarea id="txt" class="txtJavascript">hola mundo!!</textarea>
+            <textarea id="txt" class="txtJavascript">console.log("hola mundo!!")</textarea>
         </div>
         <h2>Python</h2>
         <div class="py">
-            <textarea class="txtpython">hola mundo!!</textarea>
+            <textarea id="txtpython" class="txtpython">print "hola mundo!!!"</textarea>
         </div>
     </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>    
 <script src="archivosJS/peticiones.js"></script>
+<script src="archivosJS/logica.js"></script>
 
 </body>
 </html>

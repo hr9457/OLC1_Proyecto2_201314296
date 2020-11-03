@@ -12,16 +12,18 @@ Para la traduccion a python, en el analisis previo de Java se ha ha realizado un
 
 ## Construccion de API
 
-para la construccion de las apis para traductor en donde se la pagina principal hara las consultad se ha uitilizado [Node Js](https://nodejs.org/en/) para la cual se ha requerido los modulos de: 
+para la construccion de las apis las cuales son los que nos devuelven la informacion de cada traduccion para ser mostrada en la pagina principal hara uos de la herrmaienta [Node Js](https://nodejs.org/en/) para la cual se ha requerido los modulos de: 
 * Express
 * Cors
 * Morgan
+
+Las apis estaran sirviendo en los puertos 3000 para JS,3500 para python
 
 ## Pagina Web 
 
 En la pagina web ha sido construida con las herramientas de html,css y js
 
-para la creacion de la los servicios y consumo de las api's de la pagina principal se utilizo el lenguaje de programacion **GO** 
+para la creacion de la los servicios y consumo de las api's de la pagina principal se utilizo el lenguaje de programacion **GO**  en el cual se estar levantando el servicio en el puerto 4000 para ofrecer el recurso estatico de la construccion de la pagina hacia el usuario
 
 # Manual Usuario
 
