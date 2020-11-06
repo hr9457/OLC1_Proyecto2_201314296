@@ -259,6 +259,8 @@ VARIABLE                                { $$=[{"name":"VAR","children":$1} ];  }
 |IMPRESION                              { $$=[{"name":"PRIN","children":$1} ]; }
 |IMPRESION-SALTO                        { $$=[{"name":"PRIN","children":$1} ]; }
 |RETORNO                                { $$=[{"name":"RETO","children":$1} ]; }
+|Tk_identificador '+' '+' ';'           { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4}]; }
+|Tk_identificador '-' '-' ';'           { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4}]; }
 |INSTRUCCIONES-MAIN VARIABLE            { $$=[{"name":"INST","children":$1},{"name":"VAR","children":$2} ];  }
 |INSTRUCCIONES-MAIN ASIGNACION-A        { $$=[{"name":"INST","children":$1},{"name":"ASIG","children":$2} ]; }
 |INSTRUCCIONES-MAIN LLAMADA-METODO      { $$=[{"name":"INST","children":$1},{"name":"MET","children":$2} ];  }
@@ -269,6 +271,8 @@ VARIABLE                                { $$=[{"name":"VAR","children":$1} ];  }
 |INSTRUCCIONES-MAIN IMPRESION           { $$=[{"name":"INST","children":$1},{"name":"PRIN","children":$2} ]; }
 |INSTRUCCIONES-MAIN IMPRESION-SALTO     { $$=[{"name":"INST","children":$1},{"name":"PINT","children":$2} ]; }
 |INSTRUCCIONES-MAIN RETORNO             { $$=[{"name":"INST","children":$1},{"name":"RETO","children":$2} ]; }
+|INSTRUCCIONES-MAIN Tk_identificador '+' '+' ';' { $$=[{"name":"INST","children":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5} ]; }
+|INSTRUCCIONES-MAIN Tk_identificador '-' '-' ';' { $$=[{"name":"INST","children":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5} ]; }
 ;
 
 
@@ -295,6 +299,7 @@ VARIABLE                                            { $$=[{"name":"VAR","childre
 |IMPRESION-SALTO                                    { $$=[{"name":"PRINT","children":$1}];  }
 |RETORNO                                            { $$=[{"name":"RET","children":$1}];    }
 |Tk_identificador '+' '+' ';'                       { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4}]; }
+|Tk_identificador '-' '-' ';'                       { $$=[{"name":$1},{"name":$2},{"name":$3},{"name":$4}]; }
 |INSTRUCCIONES-METODO VARIABLE                      { $$= [{"name":"INSTRU","children":$1},{"name":"VAR","children":$2}];  }
 |INSTRUCCIONES-METODO ASIGNACION-A                  { $$= [{"name":"INSTRU","children":$1},{"name":"ASIG","children":$2}]; }
 |INSTRUCCIONES-METODO FUNCION-IF                    { $$= [{"name":"INSTRU","children":$1},{"name":"FUNC","children":$2}]; }
@@ -306,6 +311,7 @@ VARIABLE                                            { $$=[{"name":"VAR","childre
 |INSTRUCCIONES-METODO IMPRESION-SALTO               { $$= [{"name":"INSTRU","children":$1},{"name":"PRINT","children":$2}]; }
 |INSTRUCCIONES-METODO RETORNO                       { $$= [{"name":"INSTRU","children":$1},{"name":"RET","children":$2}];  }
 |INSTRUCCIONES-METODO Tk_identificador '+' '+' ';'  { $$= [{"name":"INSTRU","children":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5}]; }
+|INSTRUCCIONES-METODO Tk_identificador '-' '-' ';'  { $$= [{"name":"INSTRU","children":$1},{"name":$2},{"name":$3},{"name":$4},{"name":$5}]; }
 ;
 
 
@@ -451,6 +457,7 @@ VARIABLE                                            { $$=[ {"name":"VAR","childr
 |IMPRESION-SALTO                                    { $$=[ {"name":"PRIN","children":$1} ]; }
 |RETORNO                                            { $$=[ {"name":"RET","children":$1} ]; }
 |Tk_identificador '+' '+' ';'                       { $$=[ {"name":$1},{"name":$2},{"name":$3},{"name":$4} ]; }
+|Tk_identificador '-' '-' ';'                       { $$=[ {"name":$1},{"name":$2},{"name":$3},{"name":$4} ]; }
 |INSTRUCCIONES-CICLOS FUNCION-IF                    { $$=[ {"name":"INST","children":$1},{"name":"FUN","children":$2} ]; }
 |INSTRUCCIONES-CICLOS FUNCION-FOR                   { $$=[ {"name":"INST","children":$1},{"name":"FUN","children":$2} ]; }
 |INSTRUCCIONES-CICLOS FUNCION-WHILE                 { $$=[ {"name":"INST","children":$1},{"name":"FUN","children":$2} ]; }
@@ -460,6 +467,7 @@ VARIABLE                                            { $$=[ {"name":"VAR","childr
 |INSTRUCCIONES-CICLOS IMPRESION-SALTO               { $$=[ {"name":"INST","children":$1},{"name":"PRIN","children":$2} ]; }
 |INSTRUCCIONES-CICLOS RETORNO                       { $$=[ {"name":"INST","children":$1},{"name":"RE","children":$2} ]; }
 |INSTRUCCIONES-CICLOS Tk_identificador '+' '+' ';'  { $$=[ {"name":"INST","children":$1},{"name":$2},{"neme":$3},{"name":$4},{"name":$5} ]; }
+|INSTRUCCIONES-CICLOS Tk_identificador '-' '-' ';'  { $$=[ {"name":"INST","children":$1},{"name":$2},{"neme":$3},{"name":$4},{"name":$5} ]; }
 ;
 
 

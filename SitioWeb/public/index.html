@@ -96,12 +96,12 @@
     <!-- PESTANIAS MULTIPLE  -->
     <div class="container">
         <!--OPCIONES PARA EL USUARIO SOBRE EL TEXTO-->
-        <button onclick="setInfo2(getInstacia())">Analizar</button>
+        <button onclick="setInfo2(getInstacia()),setInfoPython(getInstacia())">Analizar</button>
         <button onclick="tablaReportes()">Tokens J</button>
         <button onclick="tablaErrores()">Errores J</button>
         <button onclick="tree()">AST J</button>
-        <button onclick="tree()">Tokens P</button>
-        <button onclick="tree()">Errores P</button>
+        <button onclick="tablaReportesPython()">Tokens P</button>
+        <button onclick="tablaErroresPython()">Errores P</button>
         <!-- paginas pricipales -->
         <ul class="tabs">
             <li id="p1" class="tab current" data-tab="tab-1" onclick="obtenerInstacia(editor,'p1')">Pagina 1</li>

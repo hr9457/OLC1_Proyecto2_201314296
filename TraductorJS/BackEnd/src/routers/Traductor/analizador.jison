@@ -138,9 +138,9 @@
 // mayor prioridad
 %left '*' '/'
 //not
-%left '!'
+//%left '!'
 // presedencia explicita
-%left NEGATIVOS 
+%left '!' NEGATIVOS 
 
 
 //--------------------------------------------------------------
@@ -187,7 +187,7 @@ ESTRUCTURA-INTERFACE    {}
 ESTRUCTURA-CLASE:
 'Tk_public' 'TK_class' 'Tk_identificador' '{' '}'                           { $$ = `${$1} ${$2} ${$3} ${$4} \n${$5}`; }
 |'Tk_public' 'TK_class' 'Tk_identificador' '{'  INSTRUCCIONES-CLASE  '}'    { $$ = `${$1} ${$2} ${$3} ${$4} \n${$5} \n${$6}`; }
-| error '}'                                                                 { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }");}
+| error '}'                                                                 { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }"); $$=``;}
 ;
 
 
@@ -203,7 +203,7 @@ ESTRUCTURA-INTERFACE:
 METODO-MAIN:
 'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' '}'                          { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12}`; }
 |'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' INSTRUCCIONES-MAIN '}'      { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12} ${$13}`; }
-|error '}'                                                                                                                  { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }");}
+//|error '}'                                                                                                                  { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }");}
 ;
 
 
@@ -267,6 +267,8 @@ VARIABLE                                { $$=`${$1}`; }
 |IMPRESION                              { $$=`${$1}`; }
 |IMPRESION-SALTO                        { $$=`${$1}`; }
 |RETORNO                                { $$=`${$1}`; }
+|Tk_identificador '+' '+' ';'           { $$=`${$1}${$2}${$3}${$4}`; }
+|Tk_identificador '-' '-' ';'           { $$=`${$1}${$2}${$3}${$4}`; }
 |INSTRUCCIONES-MAIN VARIABLE            { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-MAIN ASIGNACION-A        { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-MAIN LLAMADA-METODO      { $$=`${$1}\n${$2}`; }
@@ -277,6 +279,8 @@ VARIABLE                                { $$=`${$1}`; }
 |INSTRUCCIONES-MAIN IMPRESION           { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-MAIN IMPRESION-SALTO     { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-MAIN RETORNO             { $$=`${$1}\n${$2}`; }
+|INSTRUCCIONES-MAIN Tk_identificador '+' '+' ';'  { $$=`${$1}\n${$2}${$3}${$4}${$5}`; }
+|INSTRUCCIONES-MAIN Tk_identificador '-' '-' ';'  { $$=`${$1}\n${$2}${$3}${$4}${$5}`; }
 ;
 
 
@@ -303,6 +307,7 @@ VARIABLE                                            { $$=`${$1}`; }
 |IMPRESION-SALTO                                    { $$=`${$1}`; }
 |RETORNO                                            { $$=`${$1}`; }
 |Tk_identificador '+' '+' ';'                       { $$=`${$1}${$2}${$3}${$4}`; }
+|Tk_identificador '-' '-' ';'                       { $$=`${$1}${$2}${$3}${$4}`; }
 |INSTRUCCIONES-METODO VARIABLE                      { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-METODO ASIGNACION-A                  { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-METODO FUNCION-IF                    { $$=`${$1}\n${$2}`; }
@@ -314,6 +319,7 @@ VARIABLE                                            { $$=`${$1}`; }
 |INSTRUCCIONES-METODO IMPRESION-SALTO               { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-METODO RETORNO                       { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-METODO Tk_identificador '+' '+' ';'  { $$=`${$1}\n${$2}${$3}${$4}${$5}`; }
+|INSTRUCCIONES-METODO Tk_identificador '-' '-' ';'  { $$=`${$1}\n${$2}${$3}${$4}${$5}`; }
 ;
 
 
@@ -459,6 +465,7 @@ VARIABLE                                            { $$=`${$1}`; }
 |IMPRESION-SALTO                                    { $$=`${$1}`; }
 |RETORNO                                            { $$=`${$1}`; }
 |Tk_identificador '+' '+' ';'                       { $$=`${$1}${$2}${$3}${$4}`; }
+|Tk_identificador '-' '-' ';'                       { $$=`${$1}${$2}${$3}${$4}`; }
 |INSTRUCCIONES-CICLOS FUNCION-IF                    { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-CICLOS FUNCION-FOR                   { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-CICLOS FUNCION-WHILE                 { $$=`${$1}\n${$2}`; }
@@ -468,6 +475,7 @@ VARIABLE                                            { $$=`${$1}`; }
 |INSTRUCCIONES-CICLOS IMPRESION-SALTO               { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-CICLOS RETORNO                       { $$=`${$1}\n${$2}`; }
 |INSTRUCCIONES-CICLOS Tk_identificador '+' '+' ';'  { $$=`${$1}\n${$2}${$3}${$4}${$5}`; }
+|INSTRUCCIONES-CICLOS Tk_identificador '-' '-' ';'  { $$=`${$1}\n${$2}${$3}${$4}${$5}`; }
 ;
 
 

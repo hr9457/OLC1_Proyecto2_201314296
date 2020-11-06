@@ -64,10 +64,50 @@ function setInfo2(editor){
 }
 
 /**
+ * envio de informacion para el analizador de python
+ */
+function setInfoPython(editor){
+    var url2 = 'http://localhost:3500/analizar';
+    var texto = 'public class animal{int var1=45;}';    
+    /*
+    *verificar que se ha selecinado una tab desde el html para analizar
+    */
+    if(editor){
+        console.log("**************************************");
+        console.log("Se encontro una instacia para analizar");
+        texto = editor.getValue();
+        //console.log(texto)
+        fetch(url2,{
+            method: 'POST',
+            body: JSON.stringify({"codigo":texto}),
+            headers: {"Content-Type":"application/json"}
+        })
+        .then(response => {
+            console.log(response);
+            return response.json()
+        })
+        .catch(error => {
+            return alert("la peticon fallo con exito!");
+        })
+        .then(data =>{
+            //console.log(data)
+            txtjavascript = document.getElementById("txtpython");
+            let saludo = data;
+            //console.log(saludo.translation)
+            txtjavascript.value = saludo.translation;
+        }) 
+    }
+    else{
+        alert("Ninguna intacia selecionada");
+    }
+}
+
+
+/**
  * consulta para el listado de tokens
  */
 function getTokens(){
-    var url = 'http://localhost:3000/listadoTokens';
+    var url = 'http://localhost:3000/listadoTokens';    
     fetch(url,{
         method: 'GET',
     })
@@ -84,7 +124,7 @@ function getTokens(){
 }
 
 /**
- * modal para ver los reportes de una forma grafica
+ * modal para ver los reportes de una forma grafica - TABLA DE LISTADO DE TOKENS JISON
  */
 function tablaReportes(){
     var divContenedor = document.createElement("div");
@@ -125,6 +165,84 @@ function tablaReportes(){
     */
     var url = 'http://localhost:3000/listadoTokens';
     fetch(url,{
+        method: 'GET',
+    })
+    .then(response => {
+        //console.log(response);
+        return response.json();
+    })
+    .then(data => {
+        //console.log(data);
+        for(var i in data){
+            let fila = document.createElement("tr");
+            let elemento1 = document.createElement("td");
+            elemento1.innerText = data[i].Fila;
+            let elemento2 = document.createElement("td");
+            elemento2.innerText = data[i].Columna;
+            let elemento3 = document.createElement("td");
+            elemento3.innerText = data[i].Tipo;
+            let elemento4 = document.createElement("td");
+            elemento4.innerText = data[i].Token;
+            fila.appendChild(elemento1);
+            fila.appendChild(elemento2);
+            fila.appendChild(elemento3);
+            fila.appendChild(elemento4);
+            tablaTokens.appendChild(fila);
+        }
+    })
+    .catch(error =>{
+        return alert("Error en ele listado de tokens")
+    })
+
+    //
+    divContenedor.appendChild(tablaTokens);
+    //agregacion
+    document.body.appendChild(divContenedor);
+}
+
+
+/**
+ * modal para ver los reportes de una forma grafica - TABLA DE LISTADO DE TOKENS PYTHON
+ */
+function tablaReportesPython(){
+    var divContenedor = document.createElement("div");
+    divContenedor.className = "divContenedorTokens";
+    divContenedor.id = "divContenedorTokens";
+    //boton para eleminar la ventana emergente
+    var closeDiv = document.createElement("button");
+    closeDiv.className = "close";
+    closeDiv.id = "close";
+    closeDiv.innerHTML = "X";
+    closeDiv.onclick = function() {
+        var divContenedor = document.getElementById("divContenedorTokens");
+        document.body.removeChild(divContenedor);
+    };
+    divContenedor.appendChild(closeDiv)    
+    //tabla de contenido
+    var tablaTokens = document.createElement("table");
+    tablaTokens.className = "table";
+    var encabezado = document.createElement("thead");
+    var contenido = document.createElement("tr");
+    var fila = document.createElement("th");
+    fila.innerHTML= "FILA";
+    var columna = document.createElement("th");
+    columna.innerHTML= "COLUMNA";
+    var tipo = document.createElement("th");
+    tipo.innerHTML= "TIPO";
+    var token = document.createElement("th");
+    token.innerHTML= "TOKEN";
+    tablaTokens.appendChild(encabezado);
+    encabezado.appendChild(contenido)
+    contenido.appendChild(fila);
+    contenido.appendChild(columna);
+    contenido.appendChild(tipo);
+    contenido.appendChild(token);
+
+    /*
+    *contenido interno de la tabla
+    */
+    var url2 = 'http://localhost:3500/listadoTokens';
+    fetch(url2,{
         method: 'GET',
     })
     .then(response => {
@@ -204,6 +322,89 @@ function tablaErrores(){
     *contenido interno de la tabla
     */
     var url = 'http://localhost:3000/listadoErrores';
+    fetch(url,{
+        method: 'GET',
+    })
+    .then(response => {
+        //console.log(response);
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+        for(var i in data){
+            let fila = document.createElement("tr");
+            //
+            let elemento1 = document.createElement("td");
+            elemento1.innerText = data[i].Tipo;
+            let elemento2 = document.createElement("td");
+            elemento2.innerText = data[i].Fila;
+            let elemento3 = document.createElement("td");
+            elemento3.innerText = data[i].Columna;
+            let elemento4 = document.createElement("td");
+            elemento4.innerText = data[i].Descripcion;
+            //
+            fila.appendChild(elemento1);
+            fila.appendChild(elemento2);
+            fila.appendChild(elemento3);
+            fila.appendChild(elemento4);
+            //
+            tablaTokens.appendChild(fila);
+        }
+    })
+    .catch(error =>{
+        return alert("Error Reporte Errores!")
+    })
+    //
+    divContenedor.appendChild(tablaTokens);
+    //agregacion
+    document.body.appendChild(divContenedor);
+}
+
+
+/*
+*           PYTHON
+*funcion para retornar erroes obtenidos del analizador de python
+*/
+function tablaErroresPython(){
+    var divContenedor = document.createElement("div");
+    divContenedor.className = "divContenedorTokens";
+    divContenedor.id = "divContenedorTokens";
+    //boton para eleminar la ventana emergente
+    var closeDiv = document.createElement("button");
+    closeDiv.className = "close";
+    closeDiv.id = "close";
+    closeDiv.innerHTML = "X";
+    closeDiv.onclick = function() {
+        var divContenedor = document.getElementById("divContenedorTokens");
+        document.body.removeChild(divContenedor);
+    };
+    divContenedor.appendChild(closeDiv)    
+    //tabla de contenido
+    let tablaTokens = document.createElement("table");
+    tablaTokens.className = "table";
+    //titulos
+    let encabezado = document.createElement("thead");
+    let contenido = document.createElement("tr");
+    let tipo = document.createElement("th");
+    tipo.innerHTML= "TIPO";
+    let fila = document.createElement("th");
+    fila.innerHTML= "FILA";
+    let columna = document.createElement("th");
+    columna.innerHTML= "COLUMNA";
+    let des = document.createElement("th");
+    des.innerHTML= "DESCRIPCION";
+    //
+    tablaTokens.appendChild(encabezado);
+    encabezado.appendChild(contenido)
+    contenido.appendChild(tipo);
+    contenido.appendChild(fila);
+    contenido.appendChild(columna);
+    contenido.appendChild(des);
+    //
+    /*
+    *contenido interno de la tabla
+    */
+    var url = 'http://localhost:3500/listadoErrores';
     fetch(url,{
         method: 'GET',
     })

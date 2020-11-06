@@ -247,8 +247,8 @@ function analizador(cadena){
                 break;
             //
             case 7:
-                addToken(fila,columna,'stringCadena',token);
-                addToken2('string',token);
+                addToken(fila,columna,'string',token);
+                addToken2('stringCadena',token);
                 this.token='';
                 this.columna++;
                 this.estado=0;
@@ -378,17 +378,20 @@ function analizador(cadena){
     /*
     *
     */
-    addToken2('UltimoToken','');    
+    addToken2('UltimoToken','');  
+    console.log(listaTokens);  
+    return listaTokens 
     /*
     *llamada al analisis sintactico
     */
-    tokenPreanalisis = listaTokens2[0].Tipo;
-    valorPreanalisis = listaTokens2[0].Token;
+    //tokenPreanalisis = listaTokens2[0].Tipo;
+    //valorPreanalisis = listaTokens2[0].Token;
     //console.log(tokenPreanalisis);
-    analisisSintactico();// 
-    console.log(listaTokens);  
-    this.puntero=0;
+    analisisSintactico();//      
+    //this.puntero=0;
 }
+
+
 
 /*****************************************************************************************/
 /**
@@ -398,12 +401,13 @@ function match(token)
 {
     if(token!=tokenPreanalisis)
     {
+        //console.log('T envio:'+token+' diferente A: '+tokenPreanalisis);
         return false;
     }
     else
     {
         token = tokenPreanalisis;
-        console.log("Token: "+token+" hizo match con: "+tokenPreanalisis);
+        //console.log("Token: "+token+" hizo match con: "+tokenPreanalisis);
         posicionLista++;
         tokenPreanalisis = listaTokens2[posicionLista].Tipo;
         valorPreanalisis = listaTokens2[posicionLista].Token;
@@ -433,7 +437,8 @@ function error()
 function analisisSintactico()
 {
     console.log("inicio sintactico");
-    java2();
+    var java = java2();//llamado a todo lo que acepta java
+    console.log(java);
 }
 
 /**
@@ -445,12 +450,16 @@ function java2()
     {
         case 'public':
             match('public');
-            clase_interface();
-            break;
+            var clase = clase_interface();
+            if(listaTokens2[posicionLista].Tipo=='public')
+            {
+                var recursividadJAVA = java2();
+                return ''+clase+'\n\n'+recursividadJAVA;
+            }
+            return ''+clase;
         default:
             return false;
     }
-    java2();
 }
 
 /**
@@ -462,35 +471,148 @@ function clase_interface()
     {
         case 'class':
             if(match('class')==false){break;}
-            var id = valorPreanalisis;
+            var id = listaTokens2[posicionLista].Token;
             if(match('id')==false){break;}
             if(match('{')==false){break;}
-
-            var fo = funcionFor();
-
+            var bloque = bloqueInstruccionClase();
             if(match('}')==false){break;}
-            console.log("class "+id+":");
+            return 'class '+id+':\n'+bloque;
 
-            console.log(fo);
-
-            break;
         case 'interface':
             if(match('interface')==false){break;}
+            var id = listaTokens2[posicionLista].Token;
             if(match('id')==false){break;}
             if(match('{')==false){break;}
+            var bloque = bloqueInstruccionInterfaze();
             if(match('}')==false){break;}
-            break;
+            return 'class '+id+':\n'+bloque;
         default:
             return false;
     }
 }
 
 /**
+ * bloque de instrucciones permitidas dentro de una clase
+ */
+function bloqueInstruccionInterfaze()
+{
+    if(listaTokens2[posicionLista].Tipo=='public')
+    {
+        var retornoMETODOINT = metodosInterface();
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='public')
+        {
+            var bloqueRecursivoInterfaze = bloqueInstruccionInterfaze();
+            return '\t'+retornoMETODOINT+'\n'+bloqueRecursivoInterfaze;
+        }
+        return '\t'+retornoMETODOINT;
+    }
+    else
+    {
+        return '';
+    }
+}
+
+function metodosInterface()
+{
+    match('public');
+    tipoRetorno();
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    match('(');
+    if(listaTokens2[posicionLista].Tipo==')')
+    {
+        match(')');
+        match(';');
+        return 'self '+identificador+' ();';
+    }
+    else 
+    {
+        var parametros = parametroJava();
+        match(')');
+        match(';');
+        return 'self '+identificador+' ('+parametros+');';
+    }
+}
+
+
+/**
+ * bloque de instrucciones permitidas dentro de una clase
+ */
+function bloqueInstruccionClase()
+{
+    if(listaTokens2[posicionLista].Tipo=='public')
+    {
+        match('public');
+        if(listaTokens2[posicionLista].Tipo=='static')
+        {//metodo main
+
+            var funcionMain = metodoMain();
+            //recursividad
+            if(listaTokens2[posicionLista].Tipo=='public'||listaTokens2[posicionLista].Tipo=='id'
+            ||listaTokens2[posicionLista].Tipo=='System'||tipoVariable()!=false)
+            {
+                var bloque = bloqueInstruccionClase();
+                return '\t'+funcionMain+'\n'+bloque;
+            }
+            return '\t'+funcionMain;
+
+        }
+        else
+        {//metodos o funciones
+
+            var funcionOmetodo = funcion_MetodoJava();
+            //recursividad
+            if(listaTokens2[posicionLista].Tipo=='public'||listaTokens2[posicionLista].Tipo=='id'
+            ||listaTokens2[posicionLista].Tipo=='System'||tipoVariable()!=false)
+            {
+                var bloque = bloqueInstruccionClase();
+                return '\t'+funcionOmetodo+'\n'+bloque;
+            }
+            return '\t'+funcionOmetodo;
+
+        }
+
+    }    
+    else if(listaTokens2[posicionLista].Tipo=='id')
+    {//asignaciones a variables
+        var retornoAsignacion = asignacionA();
+
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='public'||listaTokens2[posicionLista].Tipo=='id'
+        ||listaTokens2[posicionLista].Tipo=='System'||tipoVariable()!=false)
+        {
+            var bloque = bloqueInstruccionClase();
+            return '\t'+retornoAsignacion+'\n'+bloque;
+        }
+
+        return '\t'+retornoAsignacion;
+    }
+    else if(existeTipoVariable()!=false)
+    {//variabale en java
+        var retornoVariable = variables();
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='public'||listaTokens2[posicionLista].Tipo=='id'
+        ||listaTokens2[posicionLista].Tipo=='System'||existeTipoVariable()!=false)
+        {
+            var bloque = bloqueInstruccionClase();
+            return '\t'+retornoVariable+'\n'+bloque;
+        }
+
+        return '\t'+retornoVariable;
+    }
+    else
+    {
+        return '';
+    }
+}
+
+
+/**
  * metodo main aceptado en java
  */
 function metodoMain()
 {
-    match('public');
     match('static');
     match('void');
     match('main');
@@ -502,68 +624,341 @@ function metodoMain()
     match('id');
     match(')');
     match('{');
-    match('}');
-    return '\tdef main():';
-}
-
-/**
- * estructruas de las funciones permitidas en java
- */
-function funcionesJava()
-{
-    match('public');
-    tipoRetorno();
-    var identificador = listaTokens2[posicionLista].Token;
-    match('id');
-    match('(');
-    /**
-     * revision de entrada de parametros
-     */
-    if(listaTokens2[posicionLista].Token==')')
+    //posibilidad de que el main vengo o no con instrucciones
+    if(listaTokens2[posicionLista].Tipo=='}')
     {
-        match(')');
-        match('{');
         match('}');
-        return '\tself '+identificador+'( ):';
+        return 'def main():';
     }
     else
     {
-        var parametros = parametroJava();
-        match(')');
-        match('{');
+        var BLOQUEMAIN = bloqueInstuccionMain();
         match('}');
-        return '\tself '+identificador+'( '+parametros+' ):';
+        return 'def main():\n\t'+BLOQUEMAIN;
     }    
 }
 
 /**
- * estructrua de los metodos permitidos en java
+ * bloque de instruccines permitidas dentro del metodo main
  */
-function metodosJava()
+function  bloqueInstuccionMain()
 {
-    match('public');
+    if(listaTokens2[posicionLista].Tipo=='id')
+    {//asignacionesA,llamada a un metodo,incremento o decremento
+        
+        var retornoSUB = subBloque();
+
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='id'||listaTokens2[posicionLista].Tipo=='if'
+        ||listaTokens2[posicionLista].Tipo=='for'||listaTokens2[posicionLista].Tipo=='while'
+        ||listaTokens2[posicionLista].Tipo=='do'||listaTokens2[posicionLista].Tipo=='System'
+        ||listaTokens2[posicionLista].Tipo=='while'||listaTokens2[posicionLista].Tipo=='break'
+        ||listaTokens2[posicionLista].Tipo=='continue'||listaTokens2[posicionLista].Tipo=='return'
+        ||tipoVariable()!=false)
+        {
+            var BLOQUE = bloqueInstuccionMain();
+            return '\t'+retornoSUB+'\n\t'+BLOQUE;
+        }
+        return '\t'+retornoSUB;
+
+    }
+    else if(listaTokens2[posicionLista].Tipo=='if')
+    {
+        var retornoIF = funcionIFELSE();
+        
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='id'||listaTokens2[posicionLista].Tipo=='if'
+        ||listaTokens2[posicionLista].Tipo=='for'||listaTokens2[posicionLista].Tipo=='while'
+        ||listaTokens2[posicionLista].Tipo=='do'||listaTokens2[posicionLista].Tipo=='System'
+        ||listaTokens2[posicionLista].Tipo=='while'||listaTokens2[posicionLista].Tipo=='break'
+        ||listaTokens2[posicionLista].Tipo=='continue'||listaTokens2[posicionLista].Tipo=='return'
+        ||tipoVariable()!=false)
+        {
+            var BLOQUE = bloqueInstuccionMain();
+            return '\t'+retornoIF+'\n\t'+BLOQUE;
+        }
+        return '\t'+retornoIF;
+
+    }
+    else if(listaTokens2[posicionLista].Tipo=='for')
+    {
+        var retornoFOR = funcionFor();
+        
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='id'||listaTokens2[posicionLista].Tipo=='if'
+        ||listaTokens2[posicionLista].Tipo=='for'||listaTokens2[posicionLista].Tipo=='while'
+        ||listaTokens2[posicionLista].Tipo=='do'||listaTokens2[posicionLista].Tipo=='System'
+        ||listaTokens2[posicionLista].Tipo=='while'||listaTokens2[posicionLista].Tipo=='break'
+        ||listaTokens2[posicionLista].Tipo=='continue'||listaTokens2[posicionLista].Tipo=='return'
+        ||tipoVariable()!=false)
+        {
+            var BLOQUE = bloqueInstuccionMain();
+            return '\t'+retornoFOR+'\n\t'+BLOQUE;
+        }
+        return '\t'+retornoFOR;
+
+    }
+    else if(listaTokens2[posicionLista].Tipo=='while')
+    {
+        var retornoWHILE = funcionWhile();
+        
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='id'||listaTokens2[posicionLista].Tipo=='if'
+        ||listaTokens2[posicionLista].Tipo=='for'||listaTokens2[posicionLista].Tipo=='while'
+        ||listaTokens2[posicionLista].Tipo=='do'||listaTokens2[posicionLista].Tipo=='System'
+        ||listaTokens2[posicionLista].Tipo=='while'||listaTokens2[posicionLista].Tipo=='break'
+        ||listaTokens2[posicionLista].Tipo=='continue'||listaTokens2[posicionLista].Tipo=='return'
+        ||tipoVariable()!=false)
+        {
+            var BLOQUE = bloqueInstuccionMain();
+            return '\t'+retornoWHILE+'\n\t'+BLOQUE;
+        }
+        return '\t'+retornoWHILE;
+
+    }
+    else if(listaTokens2[posicionLista].Tipo=='do')
+    {
+        var retornoDOWHILE = funcionDoWhile();
+        
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='id'||listaTokens2[posicionLista].Tipo=='if'
+        ||listaTokens2[posicionLista].Tipo=='for'||listaTokens2[posicionLista].Tipo=='while'
+        ||listaTokens2[posicionLista].Tipo=='do'||listaTokens2[posicionLista].Tipo=='System'
+        ||listaTokens2[posicionLista].Tipo=='while'||listaTokens2[posicionLista].Tipo=='break'
+        ||listaTokens2[posicionLista].Tipo=='continue'||listaTokens2[posicionLista].Tipo=='return'
+        ||tipoVariable()!=false)
+        {
+            var BLOQUE = bloqueInstuccionMain();
+            return '\t'+retornoDOWHILE+'\n\t'+BLOQUE;
+        }
+        return '\t'+retornoDOWHILE;
+
+    }
+    else if(listaTokens2[posicionLista].Tipo=='System')
+    {
+        var retornoIMPRESION = impresiones();
+        
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='id'||listaTokens2[posicionLista].Tipo=='if'
+        ||listaTokens2[posicionLista].Tipo=='for'||listaTokens2[posicionLista].Tipo=='while'
+        ||listaTokens2[posicionLista].Tipo=='do'||listaTokens2[posicionLista].Tipo=='System'
+        ||listaTokens2[posicionLista].Tipo=='while'||listaTokens2[posicionLista].Tipo=='break'
+        ||listaTokens2[posicionLista].Tipo=='continue'||listaTokens2[posicionLista].Tipo=='return'
+        ||tipoVariable()!=false)
+        {
+            var BLOQUE = bloqueInstuccionMain();
+            return '\t'+retornoIMPRESION+'\n\t'+BLOQUE;
+        }
+        return '\t'+retornoIMPRESION;
+
+    }
+    else if(listaTokens2[posicionLista].Tipo=='break'||listaTokens2[posicionLista].Tipo=='continue'
+    ||listaTokens2[posicionLista].Tipo=='return')
+    {
+        var retornoQUIEBRE = retornos();
+        
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='id'||listaTokens2[posicionLista].Tipo=='if'
+        ||listaTokens2[posicionLista].Tipo=='for'||listaTokens2[posicionLista].Tipo=='while'
+        ||listaTokens2[posicionLista].Tipo=='do'||listaTokens2[posicionLista].Tipo=='System'
+        ||listaTokens2[posicionLista].Tipo=='while'||listaTokens2[posicionLista].Tipo=='break'
+        ||listaTokens2[posicionLista].Tipo=='continue'||listaTokens2[posicionLista].Tipo=='return'
+        ||tipoVariable()!=false)
+        {
+            var BLOQUE = bloqueInstuccionMain();
+            return '\t'+retornoQUIEBRE+'\n\t'+BLOQUE;
+        }
+        return '\t'+retornoQUIEBRE;
+
+    }
+    else if(existeTipoVariable()!=false)
+    {
+        var retornoVariable = variables();
+        
+        //recursividad
+        if(listaTokens2[posicionLista].Tipo=='id'||listaTokens2[posicionLista].Tipo=='if'
+        ||listaTokens2[posicionLista].Tipo=='for'||listaTokens2[posicionLista].Tipo=='while'
+        ||listaTokens2[posicionLista].Tipo=='do'||listaTokens2[posicionLista].Tipo=='System'
+        ||listaTokens2[posicionLista].Tipo=='while'||listaTokens2[posicionLista].Tipo=='break'
+        ||listaTokens2[posicionLista].Tipo=='continue'||listaTokens2[posicionLista].Tipo=='return'
+        ||existeTipoVariable()!=false)
+        {
+            var BLOQUE = bloqueInstuccionMain();
+            return '\t'+retornoVariable+'\n\t'+BLOQUE;
+        }
+        return '\t'+retornoVariable;
+    }
+    else
+    {
+        return '';
+    }
+}
+
+
+/**
+ * para funciones y metodos aceptados en java
+ */
+function funcion_MetodoJava()
+{
     tipoRetorno();
     var identificador = listaTokens2[posicionLista].Token;
     match('id');
     match('(');
     /**
      * revision de entrada de parametros
+     * 1. sin parametros 
+     * 2. con parametros
      */
-    if(listaTokens2[posicionLista].Token==')')
+    if(listaTokens2[posicionLista].Tipo==')')
     {
         match(')');
-        match(';');
-        return '\tself '+identificador+'( )';
+        if(listaTokens2[posicionLista].Tipo=='{')//funcion
+        {
+            match('{');
+            if(listaTokens2[posicionLista.Tipo=='}'])
+            {
+                match('}');
+                return 'def '+identificador+' ():';
+            }
+            else
+            {
+                var bloqueInstru = bloqueInstuccionMain();
+                match('}');
+                return 'def '+identificador+' ():\n\t'+bloqueInstru;
+            }
+        }
+        else if(listaTokens2[posicionLista].Tipo==';')//metodo
+        {
+            match(';');
+            return 'self '+identificador+' ();';
+        }
+
     }
     else
     {
         var parametros = parametroJava();
         match(')');
+        if(listaTokens2[posicionLista].Tipo=='{')//funcion
+        {            
+            match('{');
+            if(listaTokens2[posicionLista].Tipo=='}')
+            {
+                match('}');
+                return 'def '+identificador+' ( '+parametros+' ):';
+            }
+            else
+            {   
+                var bloqueInstru = bloqueInstuccionMain();
+                match('}');
+                return 'def '+identificador+' ():\n\t'+bloqueInstru;             
+            }            
+        }
+        else if(listaTokens2[posicionLista].Tipo==';')//metodo
+        {
+            match(';');
+            return 'self '+identificador+' ( '+parametros+' );';
+        }
+
+    } 
+}
+
+
+/**
+ * metod para llamar a una llamada a metodo o incremento o decremento, asignacion A
+ */
+function subBloque()
+{
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    if(listaTokens2[posicionLista].Tipo=='=')
+    {
+        match('=');
+        var exp = expresion();
         match(';');
-        return '\tself '+identificador+'( '+parametros+' )';
+        return ''+identificador+'='+exp;
+    }
+    else if(listaTokens2[posicionLista].Tipo=='(')
+    {
+        match('(');
+        if(listaTokens2[posicionLista].Tipo==')')
+        {
+            match(')');
+            match(';');
+            return ''+identificador+'()';
+        }
+        else
+        {
+            var retornoPARAMETROS = parametroJava();
+            match(')');
+            match(';');
+            return ''+identificador+'('+retornoPARAMETROS+')';
+        } 
+    }
+    else if(listaTokens2[posicionLista].Tipo=='+')
+    {   
+        match('+');
+        match('+');
+        match(';');
+        return ''+identificador+'++';        
+    }
+    else if(listaTokens2[posicionLista].Tipo=='-')
+    {   
+        match('-');
+        match('-');
+        match(';');
+        return ''+identificador+'--';        
+    }
+    else
+    {
+        return ''
     }
 }
 
+
+/**
+ * estrutura de una llamada a un metodo en java
+ */
+function funcionLlamadaMetodo()
+{
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    match('(');
+    if(listaTokens2[posicionLista].Tipo==')')
+    {
+        match(')');
+        match(';');
+        return ''+identificador+'()';
+    }
+    else
+    {
+        var retornoPARAMETROS = parametroJava();
+        match(')');
+        match(';');
+        return ''+identificador+'('+retornoPARAMETROS+')';
+    }    
+}
+
+function incrementoDecremento()
+{
+    var identificador = listaTokens2[posicionLista].Token;
+    match('id');
+    if(listaTokens2[posicionLista].Tipo=='+')
+    {        
+        match('+');
+        match('+');
+        return identificador+'++';
+    }
+    else
+    {
+        match('-');
+        match('-');
+        return identificador+'--';
+    }
+}
+
+/**
+ * parametros para metodos y funciones
+ */
 function parametroJava()
 {
     var tipo = tipoVariable();
@@ -588,25 +983,19 @@ function asignacionA()
     match('=');
     var exp = expresion();
     match(';');
-    return '\t'+identificador+'='+exp;
+    return identificador+'='+exp;
 }
 
+//TODO: modifique a la hora de aceder al tipo de variable
 /**
  * Estructura de variables aceptadas
  */
 function variables()
 {
     var tipo = tipoVariable();
-    if(tipo==false)
-    {
-        return false;
-    }
-    else
-    {
-        var declaRacion = declaracion();
-        match(';');
-        return '\t'+tipo+' '+declaRacion;
-    }
+    var declaRacion = declaracion();
+    match(';');
+    return 'var '+declaRacion;
 }
 
 /**
@@ -638,7 +1027,10 @@ function asignacion()
         var exp = expresion();
         return ''+identificador+'='+exp;
     }
-    return ''+identificador;
+    else
+    {
+        return ''+identificador;
+    }    
 }
 
 /**
@@ -651,8 +1043,17 @@ function funcionWhile()
     var exp = expresion();
     match(')');
     match('{');
-    match('}');
-    return '\twhile '+exp+':';
+    if(listaTokens2[posicionLista].Tipo=='}')
+    {
+        match('}');
+        return 'while '+exp+':';
+    }  
+    else
+    {
+        var bloque = bloqueInstuccionMain();
+        match('}');
+        return 'while '+exp+':\n\t'+bloque;
+    }  
 }
 
 /**
@@ -662,14 +1063,29 @@ function funcionDoWhile()
 {
     match('do');
     match('{');
-    match('}')
-    match('while');
-    match('(');
-    var exp = expresion();
-    match(')');
-    match(';');
-    return '\twhile '+exp+':';
+    if(listaTokens2[posicionLista].Tipo=='}')
+    {
+        match('}')
+        match('while');
+        match('(');
+        var exp = expresion();
+        match(')');
+        match(';');
+        return 'while '+exp+':';
+    }
+    else
+    {
+        var bloqueInstru = bloqueInstuccionMain();
+        match('}')
+        match('while');
+        match('(');
+        var exp = expresion();
+        match(')');
+        match(';');
+        return 'while '+exp+':\n\t'+bloqueInstru;
+    }    
 }
+
 
 /**
  * estructura de un funcion for aceptada en java
@@ -685,8 +1101,17 @@ function funcionFor()
     var exp2 = expresion();
     match(')');
     match('{');
-    match('}');
-    return '\tfor '+declaracion+' in range ('+exp+','+exp2+'):';
+    if(listaTokens2[posicionLista].Tipo=='}')
+    {
+        match('}');
+        return 'for '+declaracion+' in range ('+exp+','+exp2+'):';
+    }
+    else
+    {
+        var bloqueInstru = bloqueInstuccionMain();
+        match('}');
+        return 'for '+declaracion+' in range ('+exp+','+exp2+'):\n\t\t'+bloqueInstru;
+    }    
 }
 
 /**
@@ -718,6 +1143,164 @@ function dec()
 }
 
 /**
+ * estructura de una funcion if aceptda en java
+ */
+function funcionIFELSE()
+{
+    var restuldoif = funcionIF();
+    if(listaTokens2[posicionLista].Tipo=='else')
+    {
+        var resultadoElif = funcionELSE_ELIF();
+        return ''+restuldoif+'\n\t\t'+resultadoElif;
+    }
+    return ''+restuldoif;
+}
+
+/**
+ * parte superrio de un if
+ */
+function funcionIF()
+{
+    match('if');
+    match('(');
+    var retornoExpression = expresion();
+    match(')');
+    match('{');
+    if(listaTokens2[posicionLista].Tipo=='}')
+    {
+        match('}');
+        return 'if '+retornoExpression+':';
+    }
+    else
+    {
+        var bloqueInstru = bloqueInstuccionMain();
+        match('}');
+        return 'if '+retornoExpression+':\n\t\t'+bloqueInstru;
+    }
+}
+
+/**
+ * estructrua de  else 
+ */
+function funcionELSE_ELIF()
+{
+    match('else');
+    //si viene un else if
+    if(listaTokens2[posicionLista].Tipo=='if')
+    {
+        var retornoELSEIF = funcionELIF();
+        if(listaTokens2[posicionLista].Tipo=='else')
+        {
+            var retornoRECURSIVO = funcionELSE_ELIF();
+            return ''+retornoELSEIF+'\n\t\t'+retornoRECURSIVO;
+        }
+        return ''+retornoELSEIF;
+    }
+    var retornoElse = funcionELSE();
+    return ''+retornoElse;
+}
+
+/**
+ * agreacion para un else if dentro del if
+ */
+function funcionELIF()
+{
+    match('if');
+    match('(');
+    var retornoExpression = expresion();
+    match(')');
+    match('{');
+    if(listaTokens2[posicionLista].Tipo=='}')
+    {
+        match('}');
+        return 'elif '+retornoExpression+':';
+    }
+    else
+    {
+        var bloqueInstru = bloqueInstuccionMain();
+        match('}');
+        return 'elif '+retornoExpression+':\n\t\t'+bloqueInstru;      
+    }    
+}
+
+/**
+ * agregacion else para un if
+ */
+function funcionELSE()
+{
+    match('{');
+    if(listaTokens2[posicionLista].Tipo=='}')
+    {
+        match('}');
+        return 'else:';
+    }
+    else
+    {
+        var bloqueInstru = bloqueInstuccionMain();
+        match('}');
+        return 'else :\n\t\t'+bloqueInstru;      
+    }     
+}
+
+
+/**
+ * impresiones por consola aceptadas en java
+ */
+function impresiones()
+{
+    match('System');
+    match('.');
+    match('out');
+    match('.');
+    if(listaTokens2[posicionLista].Tipo=='print')
+    {
+        match('print');
+        match('(');
+        var retornoExpresion = expresion();
+        match(')');
+        match(';');
+        return 'print( '+retornoExpresion+' )';
+    }
+    else if(listaTokens2[posicionLista].Tipo=='println')
+    {
+        match('println');
+        match('(');
+        var retornoExpresion = expresion();
+        match(')');
+        match(';');
+        return 'print( '+retornoExpresion+' )';
+    }    
+}
+
+/**
+ * tipos de retornos para funciones y otros
+ */
+function retornos()
+{
+    switch(listaTokens2[posicionLista].Tipo)
+    {
+        case 'break':
+            match('break');
+            match(';');
+            return 'break';
+        case 'continue':
+            match('continue');
+            match(';');
+            return 'continue';
+        case 'return':
+            match('return');
+            if(listaTokens2[posicionLista].Tipo==';')
+            {match(';'); return 'return';}
+            else{var retornoExpresion = expresion(); match(';');return 'return '+retornoExpresion;}
+        default:
+            return false;
+    }
+}
+
+
+
+//TODO:falta agregar icremento y decremento
+/**
  ** tipos de expresiones aceptadas en java
  */
 function expresion()
@@ -739,6 +1322,10 @@ function expresion()
     {
         match('-');
         var exp = expresion();
+        if(exp=='false')
+        {
+            return '-';
+        }
         return '-'+exp;
     }
     else
@@ -811,6 +1398,11 @@ function expresion()
         else if(listaTokens2[posicionLista].Tipo=='+')
         {
             match('+');
+            if(listaTokens2[posicionLista].Tipo=='+')
+            {
+                match('+');
+                return ''+vaLor+'++';
+            }
             var exp = expresion();
             return ''+vaLor+'+'+exp;
         }
@@ -839,25 +1431,44 @@ function expresion()
 /**
  ************************************************** tipos de variables aceptadas
  */
+function existeTipoVariable()
+{
+    switch(listaTokens2[posicionLista].Tipo)
+    {
+        case 'int':
+            return true;
+        case 'boolean': 
+            return true;
+        case 'double':
+            return true;
+        case 'String':
+            return true;
+        case 'char':
+            return true;
+        default:
+            return false;
+    }
+}
+
 function tipoVariable()
 {
     switch(listaTokens2[posicionLista].Tipo)
     {
         case 'int':
             match('int');
-            return 'var';
+            return true;
         case 'boolean': 
             match('boolean');
-            return 'var';
+            return true;
         case 'double':
             match('double');
-            return 'var';
+            return true;
         case 'String':
             match('String');
-            return 'var';
+            return true;
         case 'char':
             match('char');
-            return 'var';
+            return true;
         default:
             return false;
     }
@@ -929,3 +1540,4 @@ function tipoRetorno()
             return false;
     }
 }
+
