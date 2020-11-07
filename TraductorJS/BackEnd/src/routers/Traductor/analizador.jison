@@ -6,6 +6,7 @@
     var listaErroresLexicos = []
     var listaErroresSintacticos = []
     var listaTraducccion = []
+    var listaComentarios = []
     var json;
     /* metodo para agregar y hacer el reporte de tokens reconocidos */
     function addListaToken(fila,columna,tipo,token){
@@ -15,7 +16,17 @@
     function addErrorLexico(tipo,fila,columna,descripcion){
         listaErroresLexicos.push({Tipo:tipo,Fila:fila,Columna:columna,Descripcion:descripcion});
     }
-
+    function addComentario(comentario)
+    {
+        listaComentarios.push(comentario);
+    }
+    exports.clearList = function (){
+        listaReporteToken = [];
+        listaErroresLexicos = [];
+        listaErroresSintacticos = [];
+        listaTraducccion = [];
+        istaComentarios = [];
+    }
 %}
 
 //------------------------------------------------------------------------------------------------
@@ -38,11 +49,11 @@
 \s+  {}
 
 //--------------------------------------------  comentario unilinea
-\/\/.*     {}
+\/\/.*     {addComentario(yytext);}
 
 
 //---------------------------------------------- comentario multilinea
-\/\*(\*(?!\/)|[^*])*\*\/    {}
+\/\*(\*(?!\/)|[^*])*\*\/    {addComentario(yytext);}
 
 //*********************************************
 // PALABRAS RESEREVADAS POR EL LENGUAJE JAVA 25
@@ -155,7 +166,7 @@
 //**************************************** DONDE ARRANCA LA GRAMATICA ********************************************
 INICIO: 
 EOF             {return 'Archivo Vacio';}
-| JAVA  EOF     {return [listaReporteToken,$1,listaErroresLexicos];}
+| JAVA  EOF     {return [listaReporteToken,$1,listaErroresLexicos,listaComentarios];}
 ;
 //console.log(JSON.stringify(listaReporteToken));
 
@@ -203,7 +214,7 @@ ESTRUCTURA-INTERFACE:
 METODO-MAIN:
 'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' '}'                          { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12}`; }
 |'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' INSTRUCCIONES-MAIN '}'      { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12} ${$13}`; }
-//|error '}'                                                                                                                  { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }");}
+|error '}'                                                                                                                  { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }"); $$=``;}
 ;
 
 

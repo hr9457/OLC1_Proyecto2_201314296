@@ -56,12 +56,49 @@ function setInfo2(editor){
             let saludo = data;
             //console.log(saludo.translation)
             txtjavascript.value = saludo.translation;
+            // texto = document.getElementById("txt").value + '\n***';
+            // txtjavascript.value = texto;
+            getComentarios();
         }) 
     }
     else{
         alert("Ninguna intacia selecionada");
     }
 }
+
+function getComentarios()
+{
+    var url = 'http://localhost:3000/comentarios';
+    /*
+    *verificar que se ha selecinado una tab desde el html para analizar
+    */
+    if(editor){
+        fetch(url,{
+            method: 'GET',
+        })
+        .then(response => {
+            console.log(response);
+            return response.json();
+        })
+        .then(data => {
+            //console.log(data);
+            var area = document.getElementById('txt');
+            texto = document.getElementById("txt").value;
+            for(i=0;i<data.length;i++)
+            {
+                texto = texto + '\n'+data[i]+'\n';
+            }
+            area.value = texto;
+        })
+        .catch(error =>{
+            return alert("Error en la data del arbol")
+        })
+    }
+    else{
+        alert("Ninguna intacia selecionada");
+    }
+}
+
 
 /**
  * envio de informacion para el analizador de python

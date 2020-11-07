@@ -9,17 +9,21 @@ var grafo = '';
 var listaAnalisis = [];
 var listatokens = [];
 var listaErrores = [];
+var listaComentarios = [];
 
 // peticiones
 router.post('/analizar',(req,res) =>{
     var code = req.body;
     data = code.codigo;
-    if(data){
-        //obtencion y asignacion de resultados del analisis
+    if(data){        
+        //obtencion y asignacion de resultados del analisis 
+        translation.clearList();       
         listaAnalisis = translation.parse(data);
-        listatokens = listaAnalisis[0];               
+        //******************************/
+        listatokens = listaAnalisis[0];            
         traduccion = listaAnalisis[1];
         listaErrores = listaAnalisis[2];
+        listaComentarios = listaAnalisis[3];
         grafo = tree.parse(data);
         /*************************/
         //console.log(listatokens)
@@ -59,6 +63,13 @@ router.get('/dataTree',(req,res) =>{
     //console.log(jsonGrafo)
     //console.log(grafo);
     res.send(grafo);
+})
+
+/*
+*peticion de la data para el grafico del arbol ast
+*/
+router.get('/comentarios',(req,res) =>{
+    res.send(listaComentarios);
 })
 
 /*
