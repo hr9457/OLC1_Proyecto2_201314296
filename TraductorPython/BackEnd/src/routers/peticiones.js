@@ -10,6 +10,7 @@ var listaAnalisis = [];
 var listatokens = [];
 var listadoSintatico = [];
 var listaErrores = [];
+var retornoSintactico = [];
 
 //envio de data para el retorno de reportes
 router.post('/analizar',(req,res) =>{
@@ -23,8 +24,11 @@ router.post('/analizar',(req,res) =>{
         listatokens = listaAnalisis[0];
         listadoSintatico = listaAnalisis[1];
         listaErrores = listaAnalisis[2];
-
-        var traduccion = sintatic.analisisSintactico(listadoSintatico);
+        
+        retornoSintactico = sintatic.analisisSintactico(listadoSintatico);
+        var traduccion = retornoSintactico[0];
+        var lista2 = retornoSintactico[1];
+        listaErrores.concat(lista2);
         res.json({translation: traduccion});
     }else{
         res.json({translation:"Entrada incorrecta"});

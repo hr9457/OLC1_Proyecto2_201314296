@@ -5,12 +5,16 @@ class sintactico {
     constructor()
     {
         this.listaTokens2 = [];
+        this.listaErrores = [];
         this.tokenPreanalisis;
         this.valorPreanalisis;
         this.posicionLista=0;
     }
 
-    
+    addError(tipo,fila,columna,descripcion)
+    {
+        this.listaErrores.push({Tipo:tipo,Fila:fila,Columna:columna,Descripcion:descripcion});
+    }
 
     /**
      * metodo de parea
@@ -20,6 +24,7 @@ class sintactico {
         if(token!=this.tokenPreanalisis)
         {
             //console.log('T envio:'+token+' diferente A: '+tokenPreanalisis);
+            //this.addError('Sintactico',0,0,'se esperaba '+this.tokenPreanalisis);
             return false;
         }
         else
@@ -62,7 +67,7 @@ class sintactico {
         //return ''+java;
         if(java)
         {
-            return ''+java;
+            return [''+java,this.listaErrores];
         }
         else{
             return 'class Error:\n\tprint(Archivo de entrada mal escrito)';
@@ -84,7 +89,7 @@ class sintactico {
                     var recursividadJAVA = this.java2();
                     return ''+clase+'\n\n'+recursividadJAVA;
                 }
-                return ''+clase;
+                return ''+clase;               
             default:
                 return false;
         }

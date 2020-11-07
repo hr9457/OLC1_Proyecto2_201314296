@@ -16,10 +16,12 @@
     function addErrorLexico(tipo,fila,columna,descripcion){
         listaErroresLexicos.push({Tipo:tipo,Fila:fila,Columna:columna,Descripcion:descripcion});
     }
+
     function addComentario(comentario)
     {
         listaComentarios.push(comentario);
     }
+
     exports.clearList = function (){
         listaReporteToken = [];
         listaErroresLexicos = [];
@@ -124,14 +126,14 @@
 //  secuencia para aceptar un identificador letras,numero y _ inicio o en medio
 [a-zA-Z_][a-zA-Z0-9_]*                      {addListaToken(""+yylloc.first_line,""+yylloc.first_column,"IDENTIFICADOR",""+yytext);return 'Tk_identificador';}
 
-// captura para erroles lexico , cualquier caracter, excepto los que ya definimos
-.                                           {addErrorLexico("Lexico",yylloc.first_line,yylloc.first_column,"El caracter "+yytext+" no pertenece al lenguaje");}
-
-
-
 //**********************
 //  FINAL DEL ARCHIVO
 <<EOF>> {return 'EOF';}
+
+
+// captura para erroles lexico , cualquier caracter, excepto los que ya definimos
+.                                           {listaErroresLexicos.push({Tipo:"lexico",Fila:yylloc.first_line,Columna:yylloc.first_column,Descripcion:"El caracter "+yytext+" no pertenece al lenguaje"});}
+
 
 
 /lex 
@@ -149,9 +151,9 @@
 // mayor prioridad
 %left '*' '/'
 //not
-//%left '!'
+%left '!'
 // presedencia explicita
-%left '!' NEGATIVOS 
+%left  NEGATIVOS 
 
 
 //--------------------------------------------------------------
@@ -214,7 +216,7 @@ ESTRUCTURA-INTERFACE:
 METODO-MAIN:
 'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' '}'                          { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12}`; }
 |'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' INSTRUCCIONES-MAIN '}'      { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12} ${$13}`; }
-|error '}'                                                                                                                  { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }"); $$=``;}
+//|error '}'                                                                                                                  { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }"); $$=``;}
 ;
 
 
