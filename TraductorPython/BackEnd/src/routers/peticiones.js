@@ -25,10 +25,7 @@ router.post('/analizar',(req,res) =>{
         listadoSintatico = listaAnalisis[1];
         listaErrores = listaAnalisis[2];
         
-        retornoSintactico = sintatic.analisisSintactico(listadoSintatico);
-        var traduccion = retornoSintactico[0];
-        var lista2 = retornoSintactico[1];
-        listaErrores.concat(lista2);
+        var traduccion = sintatic.analisisSintactico(listadoSintatico);
         res.json({translation: traduccion});
     }else{
         res.json({translation:"Entrada incorrecta"});

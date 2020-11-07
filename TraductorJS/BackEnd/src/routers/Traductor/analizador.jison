@@ -216,7 +216,7 @@ ESTRUCTURA-INTERFACE:
 METODO-MAIN:
 'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' '}'                          { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12}`; }
 |'Tk_public' 'Tk_static' 'Tk_void' 'Tk_main' '(' 'Tk_String' '[' ']' 'Tk_identificador' ')' '{' INSTRUCCIONES-MAIN '}'      { $$=`function main ${$5} ${$9} ${$10} ${$11} \n${$12} ${$13}`; }
-//|error '}'                                                                                                                  { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }"); $$=``;}
+|error '}'                                                                                                                  { addErrorLexico("Sintactico",this._$.first_line,this._$.first_column,"Se recupero de un error con }"); $$=``;}
 ;
 
 

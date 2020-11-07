@@ -67,7 +67,7 @@ class sintactico {
         //return ''+java;
         if(java)
         {
-            return [''+java,this.listaErrores];
+            return ''+java
         }
         else{
             return 'class Error:\n\tprint(Archivo de entrada mal escrito)';

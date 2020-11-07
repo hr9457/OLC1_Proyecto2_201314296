@@ -120,7 +120,7 @@ function setInfoPython(editor){
             headers: {"Content-Type":"application/json"}
         })
         .then(response => {
-            console.log(response);
+            //console.log(response);
             return response.json()
         })
         .catch(error => {
